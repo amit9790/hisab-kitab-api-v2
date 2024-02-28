@@ -69,5 +69,7 @@ fastify
     .register(require('./src/auth/is-admin'))
     .register(require('./src/auth/is-owner-or-admin'))
     .register(require('./src/routes/userRoutes'), {prefix: '/users'})
+    .register(require('./src/routes/versionRoute'))
+
 
 fastify.listen(process.env.SERVER_PORT || 3000, '0.0.0.0')
