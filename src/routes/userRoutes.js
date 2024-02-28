@@ -6,6 +6,7 @@ const Handlebars = require('handlebars');
 const forgotPasswordTemplateStr = fs.readFileSync(path.resolve(__dirname, '../templates/forgot-password.hbs')).toString('utf8')
 const renderForgotPasswordTemplate = Handlebars.compile(forgotPasswordTemplateStr, { noEscape: true });
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
 
 
 module.exports = function (fastify, opts, next) {
