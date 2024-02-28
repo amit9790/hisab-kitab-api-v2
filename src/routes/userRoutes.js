@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs')
 const { v4: uuidv4 } = require('uuid')
 const fs = require('fs')
 const path = require('path')
-const jwt = require('jsonwebtoken')
 const Handlebars = require('handlebars');
 const forgotPasswordTemplateStr = fs.readFileSync(path.resolve(__dirname, '../templates/forgot-password.hbs')).toString('utf8')
 const renderForgotPasswordTemplate = Handlebars.compile(forgotPasswordTemplateStr, { noEscape: true });
@@ -157,7 +156,7 @@ module.exports = function (fastify, opts, next) {
   }
 
   fastify.post('/forgot-password', forgotPasswordSchema, async (req, reply) => {
-    const User = fastify.mongo.db.model('User')
+    const User = mongoose.model('User')
     const userAccount = await User.findOne({ email: req.body.email, isDeleted: false });
     if (!!userAccount) {
       const jti = uuidv4();
@@ -205,8 +204,8 @@ module.exports = function (fastify, opts, next) {
     }
   }
   fastify.post('/reset-password', resetPasswordSchema, async (req, reply) => {
-    const UsedToken = fastify.mongo.db.model('UsedToken')
-    const User = fastify.mongo.db.model('User')
+    const UsedToken = mongoose.model('UsedToken')
+    const User = mongoose.model('User')
     try {
       const { jti, userId } = jwt.verify(req.body.resetToken, process.env.RESET_SECRET);
 
