@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const Handlebars = require('handlebars');
 const forgotPasswordTemplateStr = fs.readFileSync(path.resolve(__dirname, '../templates/forgot-password.hbs')).toString('utf8')
 const renderForgotPasswordTemplate = Handlebars.compile(forgotPasswordTemplateStr, { noEscape: true });
+const mongoose = require('mongoose')
 
 
 module.exports = function (fastify, opts, next) {
@@ -45,7 +46,7 @@ module.exports = function (fastify, opts, next) {
   }
 
   fastify.post('/register', registerSchema, async (req, reply) => {
-    const User = fastify.mongo.db.model('User')
+    const User = mongoose.model('User')
 
     User.findOne({ username: req.body.username, email: req.body.email, isDeleted: false }, async (error, user) => {
       if (error) throw error
@@ -103,7 +104,7 @@ module.exports = function (fastify, opts, next) {
   }
 
   fastify.post('/login', loginSchema, async (req, reply) => {
-    const User = fastify.mongo.db.model('User')
+    const User = mongoose.model('User')
     console.log("testing")
     User.findOne({ username: req.body.username, isDeleted: false }, async (error, user) => {
       if (error) throw error

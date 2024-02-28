@@ -36,6 +36,13 @@ const fastify = require('fastify')({
     }
 });
 
+const mongoose = require('mongoose');
+try {
+    mongoose.connect(process.env.CONNECT_DB);
+  } catch (e) {
+    console.error(e);
+  }
+
 fastify
     // .register(require('fastify-cors'), {origin: true}) //allows restricted resources on a web page to be requested from another domain outside the domain from which the first resource was served
     .register(require('fastify-auth'))
@@ -51,10 +58,11 @@ fastify
         },
         exposeRoute: true //---------------------------------do we need this?
     })
-    //get the mongodb uri from the env variables and throw an error if it doesn't work
-    .register(require('fastify-mongoose'), {uri: process.env.CONNECT_DB}, err => {
-        if (err) throw err
-    })
+    // get the mongodb uri from the env variables and throw an error if it doesn't work
+    // .register(require('fastify-mongoose'), {uri: process.env.CONNECT_DB}, err => {
+    //     if (err) throw err
+    // })
+    
 
     .register(require('./src/model/user'))
     .register(require('./src/auth/jwt-auth'))

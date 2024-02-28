@@ -21,7 +21,7 @@ module.exports = function (fastify, opts, next) {
     created: { type: Date, default: Date.now }
   })
 
-  fastify.mongo.db.model('User', User)
+  mongoose.model('User', User)
 
   const UsedToken = new Schema({
     tokenJti: String,
@@ -32,7 +32,7 @@ module.exports = function (fastify, opts, next) {
       default: Date.now
     }
   });
-  fastify.mongo.db.model('UsedToken', UsedToken);
+  mongoose.model('UsedToken', UsedToken);
 
   next()
 }

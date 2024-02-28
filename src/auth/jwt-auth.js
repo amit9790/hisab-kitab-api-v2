@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const fastifyPlugin = require('fastify-plugin')
+const mongoose = require('mongoose')
 
 const jwtAuth = function (fastify, _opts, next) {
     fastify.decorate('jwtAuth', function (request, reply, done) {
@@ -15,7 +16,7 @@ const jwtAuth = function (fastify, _opts, next) {
                     return reply.code(401).send({message: 'Unauthorized'})
                 }
                 //find the user based on the decoded info
-                fastify.mongo.db.model('User').findOne(
+                mongoose.model('User').findOne(
                     {username: decoded.username},
                     (error, user) => {
                         if (error) {

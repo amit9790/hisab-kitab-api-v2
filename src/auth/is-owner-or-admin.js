@@ -1,4 +1,5 @@
 const fastifyPlugin = require('fastify-plugin')
+const mongoose = require('mongoose')
 
 //check if the user is a provider or an admin
 const isOwnerOrAdmin = function (fastify, _opts, next) {
@@ -7,7 +8,7 @@ const isOwnerOrAdmin = function (fastify, _opts, next) {
         if (!request.headers.provider_id) {
             return reply.code(401).send({ message: 'Unauthorized: Missing provider ID' })
         }
-        fastify.mongo.db.model('Provider')
+        mongoose.model('Provider')
             .findOne(
                 //query mongodb for the provider ID and check if the isdeleted flag is not set to ture
                 { _id: request.headers.provider_id, is_deleted_flag: false },
