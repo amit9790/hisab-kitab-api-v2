@@ -1,51 +1,64 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const masterStockSchema = new mongoose.Schema({
-    type: {
+module.exports = function (fastify, opts, next) {
+  const Schema = mongoose.Schema;
+  const { v4: uuidv4 } = require('uuid');
+
+  const masterStockSchema = new mongoose.Schema(
+    {
+      _id: {type: String, default:  () => { let res = uuidv4(); return res.id}, alias: "masterStock_id" },
+
+      type: {
         type: String,
         required: true,
-        enums: ["issue", "receive"]
-    },
-    date: {
+        enums: ["issue", "receive"],
+      },
+      date: {
         type: Date,
-        required: true
-    },
-    category: {
+        required: true,
+      },
+      category: {
         type: String,
         required: true,
-        enums: ["Raw gold", "Chain", "Kada", "Para", "Jhumka"]
-    },
-    description: {
+        enums: ["Raw gold", "Chain", "Kada", "Para", "Jhumka"],
+      },
+      description: {
         type: String,
-        required: false
-    },
-    weight: {
+        required: false,
+      },
+      weight: {
         type: Number,
-        required: true
-    },
-    issuer: { // issuer/receiver name
+        required: true,
+      },
+      issuer: {
+        // issuer/receiver name
         type: String,
-        required: true
-    },
-    receiver: { // issuer/receiver name
+        required: true,
+      },
+      receiver: {
+        // issuer/receiver name
         type: String,
-        required: true
-    },
-    purity: {
+        required: true,
+      },
+      purity: {
         type: Number,
-        required: false
-    },
-    createdBy: {
+        required: false,
+      },
+      createdBy: {
         type: String,
-        required: false
-    },
-    modifiedBy: {
+        required: false,
+      },
+      modifiedBy: {
         type: String,
-        required: false
+        required: false,
+      },
+      user_id: { type: Schema.Types.ObjectId, ref: "User" },
+    },
+    {
+      timestamps: true,
     }
-}, {
-    timestamps: true
-});
+  );
 
-const masterStockModel = mongoose.model('master-stock', masterStockSchema);
-module.exports = masterStockModel;
+  mongoose.model("master-stock", masterStockSchema);
+  next();
+};

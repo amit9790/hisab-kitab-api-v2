@@ -51,8 +51,8 @@ fastify
         routePrefix: '/documentation',
         swagger: {
             info: {
-                title: 'MazingDay - Provider',
-                description: 'Provider application backend api',
+                title: 'Hisab kitab',
+                description: 'Hisab kitab application backend api',
                 version: '1.0.0'
             },
         },
@@ -65,11 +65,16 @@ fastify
     
 
     .register(require('./src/model/user'))
+    .register(require('./src/model/master-stock.model'))
+
     .register(require('./src/auth/jwt-auth'))
     .register(require('./src/auth/is-admin'))
     .register(require('./src/auth/is-owner-or-admin'))
     .register(require('./src/routes/userRoutes'), {prefix: '/users'})
     .register(require('./src/routes/versionRoute'))
+    .register(require('./src/routes/master-stock.routes'))
+    .register(require('./src/routes/adminRoutes'))
+
 
 
 fastify.listen(process.env.SERVER_PORT || 3000, '0.0.0.0')
