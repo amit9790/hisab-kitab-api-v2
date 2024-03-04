@@ -46,7 +46,7 @@ try {
 fastify
     .register(require('fastify-cors'), {origin: true}) //allows restricted resources on a web page to be requested from another domain outside the domain from which the first resource was served
     .register(require('fastify-auth'))
-    // .register(require('fastify-multipart'), {addToBody: true}) //to upload files to the server
+    .register(require('fastify-multipart'), {addToBody: true}) //to upload files to the server
     .register(require('fastify-swagger'), {
         routePrefix: '/documentation',
         swagger: {
@@ -77,4 +77,4 @@ fastify
 
 
 
-fastify.listen(process.env.SERVER_PORT || 3000, '0.0.0.0')
+fastify.listen(process.env.PORT || 3000, '0.0.0.0')

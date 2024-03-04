@@ -21,6 +21,7 @@
     "fastify-auth": "^1.2.0",
     "fastify-cors": "^6.1.0",
     "fastify-mongoose": "^0.3.0",
+    "fastify-multipart": "^5.4.0",
     "fastify-swagger": "^5.2.0",
     "handlebars": "^4.7.8",
     "http-errors": "^2.0.0",

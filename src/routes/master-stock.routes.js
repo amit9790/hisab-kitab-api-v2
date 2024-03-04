@@ -40,7 +40,7 @@ module.exports = function (fastify, opts, next) {
         } else {
             stock = await MasterStock.findOne({ user_id: request.user._id });
         }
-        return getFilteredMasterStockInfo(provider);
+        return getFilteredMasterStockInfo(stock);
     });
 
     const updatMasterStockSchema = {
