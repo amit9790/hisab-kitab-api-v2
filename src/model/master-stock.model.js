@@ -52,6 +52,11 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      is_deleted_flag: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
       user_id: { type: Schema.Types.ObjectId, ref: "User" },
     },
     {
