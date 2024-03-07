@@ -96,7 +96,7 @@ fastify.get('/admin/masterStock-list', masterStockListSchema, async (request, re
         page: parseInt(request.query.page) || 1,
         limit: parseInt(request.query.itemsPerPage) || 25
     }
-    const masterStocks = await MasterStock.find({is_deleted_flag: false}, {}, options);
+    const masterStocks = await MasterStock.find({}, {}, options);
     return masterStocks;
 
 });
