@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcryptjs')
-const crypto = require('crypto')
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const removeEmpty = require('../utility/removeEmpty')
 
 
@@ -28,6 +28,8 @@ const updatMasterStockSchema = {
             purity: { type: 'string' },
             createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
+            issue22k:  { type: 'string' },
+            receive22k: { type: 'string'},
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -54,6 +56,8 @@ fastify.post('/admin/masterStock', updatMasterStockSchema, async (request, _repl
             purity: request.body.purity,
             createdBy: request.user.email,
             modifiedBy: request.user.email,
+            issue22k:  request.user.issue22k,
+            receive22k: request.user.receive22k,
             }
 
 

@@ -31,12 +31,10 @@ module.exports = function (fastify, opts, next) {
         required: true,
       },
       issuer: {
-        // issuer/receiver name
         type: String,
         required: true,
       },
       receiver: {
-        // issuer/receiver name
         type: String,
         required: true,
       },
@@ -50,6 +48,14 @@ module.exports = function (fastify, opts, next) {
       },
       modifiedBy: {
         type: String,
+        required: false,
+      },
+      receive22k: {
+        type: Number,
+        required: false,
+      },
+      issue22k: {
+        type: Number,
         required: false,
       },
       is_deleted_flag: {
