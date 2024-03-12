@@ -1,7 +1,4 @@
-// const bodyParser = require('body-parser');
-// // const MONGODB = require('../database/mongodb.config');
-// const apiRoutes = require('./src/routes/api.routes');
-// const authRoutes = require('./src/auth/auth.routes');
+
 require('dotenv').config();
 
 function ajvPlugin(ajv, _options) {
@@ -57,24 +54,21 @@ fastify
             },
         },
         exposeRoute: true //---------------------------------do we need this?
-    })
-    // get the mongodb uri from the env variables and throw an error if it doesn't work
-    // .register(require('fastify-mongoose'), {uri: process.env.CONNECT_DB}, err => {
-    //     if (err) throw err
-    // })
-    
+    }) 
 
     .register(require('./src/model/user'))
-    .register(require('./src/model/master-stock.model'))
+    .register(require('./src/model/master-stock'))
+    .register(require('./src/model/melting-book'))
+
 
     .register(require('./src/auth/jwt-auth'))
     .register(require('./src/auth/is-admin'))
     .register(require('./src/auth/is-owner-or-admin'))
     .register(require('./src/routes/userRoutes'), {prefix: '/users'})
     .register(require('./src/routes/versionRoute'))
-    .register(require('./src/routes/master-stock.routes'))
-    .register(require('./src/routes/adminRoutes'))
-
-
+    .register(require('./src/routes/admin/admin-masterStock'), {prefix: '/admin'})
+    .register(require('./src/routes/admin/admin-meltingBook'), {prefix: '/admin'})
+    .register(require('./src/routes/normal_user/master-stock.routes'))
+    .register(require('./src/routes/normal_user/melting-book.routes'))
 
 fastify.listen(process.env.PORT || 3000, '0.0.0.0')

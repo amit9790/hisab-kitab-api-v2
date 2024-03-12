@@ -1,23 +1,23 @@
-const getFilteredMasterStockInfo = require('../utility/filterDeleted');
+const getFilteredMasterStockInfo = require('../../utility/filterDeleted');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require("mongoose");
 
 
 module.exports = function (fastify, opts, next) {
 
-    const masterStockDetailsSchema = {
+    const meltingStockDetailsSchema = {
         schema: {
             description: 'Only authenticate access',
-            tags: ['MasterStock'],
-            summary: 'Get master Stock details',
+            tags: ['MeltingStock'],
+            summary: 'Get melting Stock details',
             security: [{ apiKey: [] }],
         },
         preHandler: fastify.auth([fastify.jwtAuth])
     }
 
-    fastify.get('/masterStock', masterStockDetailsSchema, async (request, reply) => {
+    fastify.get('/meltingBook', meltingStockDetailsSchema, async (request, reply) => {
         reply.type('application/json').code(200)
-        const MasterStock = mongoose.model('master-stock')
+        const MasterStock = mongoose.model('melting-book')
         let stock;
         if (request.isAdminUser) {
             if (!request.headers.masterStock_id) {
@@ -33,7 +33,7 @@ module.exports = function (fastify, opts, next) {
         return getFilteredMasterStockInfo(stock);
     });
 
-    const updatMasterStockSchema = {
+    const updatMeltingBookSchema = {
         schema: {
             description: 'Only authenticate access',
             tags: ['MasterStock'],
@@ -60,7 +60,7 @@ module.exports = function (fastify, opts, next) {
         preHandler: fastify.auth([fastify.jwtAuth])
     }
 
-    fastify.post('/masterStock', updatMasterStockSchema, async (request, reply) => {
+    fastify.post('/meltingBook', updatMeltingBookSchema, async (request, reply) => {
         reply.type('application/json').code(200)
         const MasterStock = mongoose.model('master-stock')
         const User = mongoose.model('User')
@@ -119,32 +119,6 @@ module.exports = function (fastify, opts, next) {
 
             return getFilteredMasterStockInfo(masterStock);
 
-
-    });
-
-    const masterStockDeleteSchema = {
-        schema: {
-            description: 'Admin only: soft delete the MasterStock and associated user account',
-            tags: ['Admin'],
-            summary: 'todo',
-            security: [{apiKey: []}],
-        },
-        consumes: ['multipart/form-data'],
-        body: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-                masterstockId: { type: "array", items: { type: "string" } },
-            },
-        },
-        preHandler: fastify.auth([fastify.jwtAuth,fastify.isAdmin], {relation: 'and'})
-    }
-    fastify.post('/admin/masterStockDelete', masterStockDeleteSchema, async (request, reply) => {
-        const MasterStock = mongoose.model('master-stock')
-        console.log(request.body);
-        const masterStockInfo = await MasterStock.updateMany({ _id: request.body.masterstockId }, {is_deleted_flag: true}, { multi: true })
-        // console.log(masterStockInfo);
-        return {success: true, message: 'User deleted'};
     });
 
     next()
