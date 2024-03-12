@@ -162,7 +162,7 @@ const meltingBookDeleteSchema = {
 fastify.post('/meltingBookDelete', meltingBookDeleteSchema, async (request, reply) => {
     const MeltingBook = mongoose.model('melting-book')
     console.log(request.body);
-    const masterStockInfo = await MeltingBook.updateMany({ _id: request.body.masterstockId }, {is_deleted_flag: true}, { multi: true })
+    const masterStockInfo = await MeltingBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};
 });
