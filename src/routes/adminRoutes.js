@@ -56,8 +56,8 @@ fastify.post('/admin/masterStock', updatMasterStockSchema, async (request, _repl
             purity: request.body.purity,
             createdBy: request.user.email,
             modifiedBy: request.user.email,
-            issue22k:  request.user.issue22k,
-            receive22k: request.user.receive22k,
+            issue22k:  request.body.issue22k,
+            receive22k: request.body.receive22k,
             }
 
 
