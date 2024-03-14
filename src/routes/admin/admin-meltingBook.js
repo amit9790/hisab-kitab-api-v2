@@ -17,9 +17,9 @@ const addMeltingBookSchema = {
         properties: {
             date: { type: 'string' },
             description: { type: 'string' },
-            weight24K: { type: 'string' },
+            weight24k: { type: 'string' },
             purity: { type: 'string' },
-            issue22K: { type: 'string' },
+            issue22k: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -37,7 +37,7 @@ fastify.post('/meltingBook', addMeltingBookSchema, async (request, _reply) => {
             description: request.body.description,
             weight24K: request.body.weight24K,
             purity: request.body.purity,
-            issue22K: request.body.issue22K,
+            issue22k: request.body.issue22k,
             createdBy: request.user.email,
             is_receiver_updated: false
             }
@@ -73,11 +73,11 @@ const updatMeltingBookSchema = {
             description: { type: 'string' },
             weight24K: { type: 'string' },
             purity: { type: 'string' },
-            issue22K: { type: 'string' },
+            issue22: { type: 'string' },
             createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
             receive22k: { type: 'string' },
-            loss22K: { type: 'string' },
+            loss22k: { type: 'string' },
 
         },
     },
@@ -94,7 +94,7 @@ fastify.patch('/update/meltingBook', updatMeltingBookSchema, async (request, _re
 
         const meltingBook_data = {
             receive22k: request.body.receive22k,
-            loss22K: request.body.loss22K,
+            loss22k: request.body.loss22k,
             is_receiver_updated: true,
             modifiedBy: request.user.email,
             }

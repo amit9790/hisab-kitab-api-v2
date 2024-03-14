@@ -26,15 +26,15 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
-      issue22K: {
+      issue22k: {
         type: Number,
         required: true,
       },
-      receive22K: {
+      receive22k: {
         type: String,
         required: true,
       },
-      loss22K: {
+      loss22k: {
         type: String,
         required: true,
       },
