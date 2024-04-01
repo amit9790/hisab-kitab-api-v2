@@ -17,7 +17,7 @@ module.exports = function (fastify, opts, next) {
         required: true,
         enums: ["issue", "receive"],
       },
-      weight24K: {
+      weight24k: {
         type: String,
         required: true,
         enums: ["Raw gold", "Chain", "Kada", "Para", "Jhumka"],

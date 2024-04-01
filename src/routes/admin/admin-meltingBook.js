@@ -35,7 +35,7 @@ fastify.post('/meltingBook', addMeltingBookSchema, async (request, _reply) => {
             meltingBook_id: meltingBookId,
             date: request.body.date,
             description: request.body.description,
-            weight24K: request.body.weight24K,
+            weight24k: request.body.weight24k,
             purity: request.body.purity,
             issue22k: request.body.issue22k,
             createdBy: request.user.email,
@@ -71,7 +71,7 @@ const updatMeltingBookSchema = {
         properties: {
             date: { type: 'string' },
             description: { type: 'string' },
-            weight24K: { type: 'string' },
+            weight24k: { type: 'string' },
             purity: { type: 'string' },
             issue22: { type: 'string' },
             createdBy: { type: 'string' },
