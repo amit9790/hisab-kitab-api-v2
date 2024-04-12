@@ -73,7 +73,8 @@ const updatMeltingBookSchema = {
             description: { type: 'string' },
             weight24k: { type: 'string' },
             purity: { type: 'string' },
-            issue22: { type: 'string' },
+            issue22k: { type: 'string' },
+            issue22kActual: {type: 'string'},
             createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
             receive22k: { type: 'string' },
@@ -94,6 +95,7 @@ fastify.patch('/update/meltingBook', updatMeltingBookSchema, async (request, _re
 
         const meltingBook_data = {
             receive22k: request.body.receive22k,
+            issue22kActual: request.body.issue22kActual,
             loss22k: request.body.loss22k,
             is_receiver_updated: true,
             modifiedBy: request.user.email,

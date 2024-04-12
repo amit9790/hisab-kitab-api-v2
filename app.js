@@ -60,6 +60,7 @@ fastify
     .register(require('./src/model/master-stock'))
     .register(require('./src/model/melting-book'))
     .register(require('./src/model/kareegar'))
+    .register(require('./src/model/utility'))
 
     .register(require('./src/auth/jwt-auth'))
     .register(require('./src/auth/is-admin'))
@@ -69,6 +70,7 @@ fastify
     .register(require('./src/routes/admin/admin-masterStock'), {prefix: '/admin'})
     .register(require('./src/routes/admin/admin-meltingBook'), {prefix: '/admin'})
     .register(require('./src/routes/admin/admin-kareegar'), {prefix: '/admin'})
+    .register(require('./src/routes/admin/admin-utility'), {prefix: '/admin'})
     .register(require('./src/routes/normal_user/master-stock.routes'))
     .register(require('./src/routes/normal_user/melting-book.routes'))
 

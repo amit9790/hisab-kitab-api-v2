@@ -30,6 +30,10 @@ module.exports = function (fastify, opts, next) {
         type: Number,
         required: true,
       },
+      issue22kActual: {
+        type: Number,
+        required: true,
+      },
       receive22k: {
         type: String,
         required: true,
