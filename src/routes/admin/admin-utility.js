@@ -4,55 +4,55 @@ const removeEmpty = require('../../utility/removeEmpty')
 
 module.exports = function (fastify, _opts, next) {
 
-const addUtilitySchema = {
-    schema: {
-        description: 'Admin only: Add utility data',
-        tags: ['Admin'],
-        summary: 'todo',
-        security: [{apiKey: []}],
-    },
-    body: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-            masterStockOpeningBalance: { type: 'string' },
-            masterStockClosingBalance: { type: 'string' },
-            meltingBookOpeningBalance: { type: 'string' },
-            meltingBookClosingBalance: { type: 'string' },
-        },
-    },
-    preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
-}
+// const addUtilitySchema = {
+//     schema: {
+//         description: 'Admin only: Add utility data',
+//         tags: ['Admin'],
+//         summary: 'todo',
+//         security: [{apiKey: []}],
+//     },
+//     body: {
+//         type: 'object',
+//         additionalProperties: false,
+//         properties: {
+//             masterStockOpeningBalance: { type: 'string' },
+//             masterStockClosingBalance: { type: 'string' },
+//             meltingBookOpeningBalance: { type: 'string' },
+//             meltingBookClosingBalance: { type: 'string' },
+//         },
+//     },
+//     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
+// }
 
-fastify.post('/utilityData', addUtilitySchema, async (request, _reply) => {
-    // create the user
-    const UtilityBook = mongoose.model('utility');
-    const utilityId = uuidv4();
-    try {
+// fastify.post('/utilityData', addUtilitySchema, async (request, _reply) => {
+//     // create the user
+//     const UtilityBook = mongoose.model('utility');
+//     const utilityId = uuidv4();
+//     try {
 
-        const utilityBook_data = {
-            utilityBook_id: utilityId,
-            masterStockOpeningBalance: request.body.masterStockOpeningBalance,
-            masterStockClosingBalance: request.body.masterStockClosingBalance,
-            meltingBookOpeningBalance: request.body.meltingBookOpeningBalance,
-            meltingBookClosingBalance: request.body.meltingBookClosingBalance,
-            }
+//         const utilityBook_data = {
+//             utilityBook_id: utilityId,
+//             masterStockOpeningBalance: request.body.masterStockOpeningBalance,
+//             masterStockClosingBalance: request.body.masterStockClosingBalance,
+//             meltingBookOpeningBalance: request.body.meltingBookOpeningBalance,
+//             meltingBookClosingBalance: request.body.meltingBookClosingBalance,
+//             }
 
-        const cleaned_utilityBook_data = removeEmpty(utilityBook_data);
+//         const cleaned_utilityBook_data = removeEmpty(utilityBook_data);
 
-        await UtilityBook.findOneAndUpdate(
-            {_id: utilityId},
-            cleaned_utilityBook_data,
-            {useFindAndModify: true, upsert: true, new: true}
-        );
+//         await UtilityBook.findOneAndUpdate(
+//             {_id: utilityId},
+//             cleaned_utilityBook_data,
+//             {useFindAndModify: true, upsert: true, new: true}
+//         );
 
-        const utilityBook = await UtilityBook.find({}).populate('user_id', ['_id', 'email'])
-        return utilityBook;
-    }
-    catch (e) {
-        console.log(e);
-    }
-})
+//         const utilityBook = await UtilityBook.find({}).populate('user_id', ['_id', 'email'])
+//         return utilityBook;
+//     }
+//     catch (e) {
+//         console.log(e);
+//     }
+// })
 
 const updatUtilitySchema = {
     schema: {
