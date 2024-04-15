@@ -12,6 +12,11 @@ module.exports = function (fastify, opts, next) {
         type: Date,
         required: true,
       },
+      category: {
+        type: String,
+        required: true,
+        enums: ["Gold", "Bhuka"],
+      },
       description: {
         type: String,
         required: true,
@@ -26,7 +31,15 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      conversion: {
+        type: String,
+        required: false,
+      },
       issue22k: {
+        type: Number,
+        required: true,
+      },
+      issue22kActual: {
         type: Number,
         required: true,
       },
