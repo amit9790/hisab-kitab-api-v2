@@ -12,6 +12,11 @@ module.exports = function (fastify, opts, next) {
         type: Date,
         required: true,
       },
+      category: {
+        type: String,
+        required: true,
+        enums: ["Gold", "Bhuka"],
+      },
       description: {
         type: String,
         required: true,
@@ -23,6 +28,10 @@ module.exports = function (fastify, opts, next) {
         enums: ["Raw gold", "Chain", "Kada", "Para", "Jhumka"],
       },
       purity: {
+        type: String,
+        required: false,
+      },
+      conversion: {
         type: String,
         required: false,
       },

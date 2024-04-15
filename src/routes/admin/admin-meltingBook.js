@@ -17,8 +17,10 @@ const addMeltingBookSchema = {
         properties: {
             date: { type: 'string' },
             description: { type: 'string' },
+            category: { type: 'string' },
             weight24k: { type: 'string' },
             purity: { type: 'string' },
+            conversion: { type: 'conversion'},
             issue22k: { type: 'string' },
         },
     },
@@ -35,8 +37,10 @@ fastify.post('/meltingBook', addMeltingBookSchema, async (request, _reply) => {
             meltingBook_id: meltingBookId,
             date: request.body.date,
             description: request.body.description,
+            category: request.body.category,
             weight24k: request.body.weight24k,
             purity: request.body.purity,
+            conversion: request.body.conversion,
             issue22k: request.body.issue22k,
             createdBy: request.user.email,
             is_receiver_updated: false
@@ -71,8 +75,10 @@ const updatMeltingBookSchema = {
         properties: {
             date: { type: 'string' },
             description: { type: 'string' },
+            category: { type: 'string' },
             weight24k: { type: 'string' },
             purity: { type: 'string' },
+            conversion: { type: 'string' },
             issue22k: { type: 'string' },
             issue22kActual: {type: 'string'},
             createdBy: { type: 'string' },
