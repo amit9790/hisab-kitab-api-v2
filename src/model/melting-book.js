@@ -23,16 +23,16 @@ module.exports = function (fastify, opts, next) {
         enums: ["issue", "receive"],
       },
       weight24k: {
-        type: String,
+        type: [String],
         required: true,
         enums: ["Raw gold", "Chain", "Kada", "Para", "Jhumka"],
       },
       purity: {
-        type: String,
+        type: [String],
         required: false,
       },
       conversion: {
-        type: String,
+        type: [String],
         required: false,
       },
       issue22k: {
