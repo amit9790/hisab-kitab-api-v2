@@ -20,6 +20,16 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: true,
       },
+      balance: {
+        type: String,
+        required: true,
+        default:  "0",
+      },
+      boxWt: {
+        type: String,
+        required: true,
+        default: "0",
+      },
       createdBy: {
         type: String,
         required: false,

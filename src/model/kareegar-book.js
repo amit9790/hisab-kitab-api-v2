@@ -4,50 +4,58 @@ module.exports = function (fastify, opts, next) {
   const Schema = mongoose.Schema;
   const { v4: uuidv4 } = require('uuid');
 
-  const meltingStockSchema = new mongoose.Schema(
+  const kareegarBookSchema = new mongoose.Schema(
     {
-      _id: {type: String, default:  () => { let res = uuidv4(); return res.id}, alias: "meltingBook_id" },
+      _id: {type: String, default:  () => { let res = uuidv4(); return res.id}, alias: "kareegarBook_id" },
 
+      kareegar_id: {
+        type: String,
+        required: true,
+        enums: ["issue", "receive"],
+      },
+      type: {
+        type: String,
+        required: true,
+        enums: ["Issue", "Receive"],
+      },
       date: {
         type: Date,
         required: true,
       },
       category: {
-        type: [String],
-        required: true,
-        enums: ["Gold", "Bhuka"],
-      },
-      description: {
         type: String,
-        required: true,
-        enums: ["issue", "receive"],
-      },
-      weight24k: {
-        type: [String],
         required: true,
         enums: ["Raw gold", "Chain", "Kada", "Para", "Jhumka"],
       },
-      purity: {
-        type: [String],
+      description: {
+        type: String,
         required: false,
       },
-      conversion: {
-        type: [String],
+      issue_wt: {
+        type: String,
         required: false,
       },
-      issue22k: {
+      recv_wt: {
+        type: String,
+        required: false,
+      },
+      loss_wt: {
+        type: String,
+        required: false,  
+      },
+      beads_issue_wt: {
+        type: String,
+        required: false,
+      },
+      beads_recv_wt: {
+        type: String,
+        required: false,
+      },
+      issuer: {
         type: String,
         required: true,
       },
-      issue22kActual: {
-        type: String,
-        required: true,
-      },
-      receive22k: {
-        type: String,
-        required: true,
-      },
-      loss22k: {
+      receiver: {
         type: String,
         required: true,
       },
@@ -58,11 +66,6 @@ module.exports = function (fastify, opts, next) {
       modifiedBy: {
         type: String,
         required: false,
-      },
-      is_receiver_updated: {
-        type: Boolean,
-        required: true,
-        default: false,
       },
       is_deleted_flag: {
         type: Boolean,
@@ -76,6 +79,6 @@ module.exports = function (fastify, opts, next) {
     }
   );
 
-  mongoose.model("melting-book", meltingStockSchema);
+  mongoose.model("kareegar-book", kareegarBookSchema);
   next();
 };

@@ -18,6 +18,8 @@ const addKareegarSchema = {
             name: { type: 'string' },
             category: { type: 'string' },
             description: { type: 'string' },
+            balance: { type: 'string' },
+            boxWt: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -88,6 +90,56 @@ fastify.patch('/update/kareegar', updateKareegarSchema, async (request, _reply) 
             name: request.body.name,
             description: request.body.description,
             category: request.body.category,
+            modifiedBy: request.user.email,
+            }
+
+        const cleaned_kareegar_data = removeEmpty(kareegar_data);
+
+        await Kareegar.findOneAndUpdate(
+            {_id: request.body._id},
+            cleaned_kareegar_data,
+            {useFindAndModify: true, upsert: true, new: true}
+        );
+
+        return {message: "updated successfully", status: true}
+    }
+    catch (e) {
+        console.log(e);
+        return {message: "error", status: false}
+
+    }
+})
+
+const updateKareegarBalanceSchema = {
+    schema: {
+        description: 'Admin only: Modify Balance and Box Wt',
+        tags: ['Admin'],
+        summary: 'todo',
+        security: [{apiKey: []}],
+    },
+    body: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+            balance: {type: 'string'},
+            boxWt: {type: 'string'}
+        },
+    },
+    preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
+}
+
+fastify.patch('/update/kareegarBalance', updateKareegarBalanceSchema, async (request, _reply) => {
+    // create the user
+    const Kareegar = mongoose.model('kareegar');
+    try {
+        if(!request.body._id){
+            request.log.error(e.message)
+        }
+
+        const kareegar_data = {
+            _id: request.body._id,
+            balance: request.body.balance,
+            boxWt: request.body.boxWt,
             modifiedBy: request.user.email,
             }
 
