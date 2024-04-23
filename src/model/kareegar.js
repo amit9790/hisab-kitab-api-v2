@@ -30,6 +30,11 @@ module.exports = function (fastify, opts, next) {
         required: true,
         default: "0",
       },
+      beads_balance:{
+        type: String,
+        required: true,
+        default: "0",
+      },
       createdBy: {
         type: String,
         required: false,
