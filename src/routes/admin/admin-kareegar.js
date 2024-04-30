@@ -19,6 +19,7 @@ const addKareegarSchema = {
             category: { type: 'string' },
             description: { type: 'string' },
             balance: { type: 'string' },
+            beads_balance: { type: 'string' },
             boxWt: { type: 'string' },
         },
     },
@@ -122,7 +123,8 @@ const updateKareegarBalanceSchema = {
         additionalProperties: false,
         properties: {
             balance: {type: 'string'},
-            boxWt: {type: 'string'}
+            boxWt: {type: 'string'},
+            beads_balance: {typeof: 'string'},
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -140,6 +142,7 @@ fastify.patch('/update/kareegarBalance', updateKareegarBalanceSchema, async (req
             _id: request.body._id,
             balance: request.body.balance,
             boxWt: request.body.boxWt,
+            beads_balance: request.body.beads_balance,
             modifiedBy: request.user.email,
             }
 

@@ -69,7 +69,7 @@ fastify.post('/kareegarBook', updateKareegarBookSchema, async (request, _reply) 
         );
 
         const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
-        return kareegarBook;
+        return kareegarBook_data;
     }
     catch (e) {
         console.log(e);

@@ -61,6 +61,7 @@ fastify
     .register(require('./src/model/melting-book'))
     .register(require('./src/model/kareegar'))
     .register(require('./src/model/kareegar-book'))
+    .register(require('./src/model/loss'))
     .register(require('./src/model/utility'))
 
     .register(require('./src/auth/jwt-auth'))
@@ -73,6 +74,7 @@ fastify
     .register(require('./src/routes/admin/admin-kareegar'), {prefix: '/admin'})
     .register(require('./src/routes/admin/admin-utility'), {prefix: '/admin'})
     .register(require('./src/routes/admin/admin-kareegarBook'), {prefix: '/admin'})
+    .register(require('./src/routes/admin/admin-loss'), {prefix: '/admin'})
     .register(require('./src/routes/normal_user/master-stock.routes'))
     .register(require('./src/routes/normal_user/melting-book.routes'))
 

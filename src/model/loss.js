@@ -4,36 +4,30 @@ module.exports = function (fastify, opts, next) {
   const Schema = mongoose.Schema;
   const { v4: uuidv4 } = require('uuid');
 
-  const kareegarSchema = new mongoose.Schema(
+  const lossSchema = new mongoose.Schema(
     {
-      _id: {type: String, default:  () => { let res = uuidv4(); return res.id}, alias: "kareegar_id" },
+      _id: {type: String, default:  () => { let res = uuidv4(); return res.id}, alias: "loss_id" },
 
-      name: {
-        type: String,
-        required: true,
-      },
-      category: {
-        type: String,
+      date: {
+        type: Date,
         required: true,
       },
       description: {
         type: String,
         required: true,
       },
-      balance: {
+      type: {
         type: String,
         required: true,
-        default:  "0",
+        enums: ["Melting", "Kareegar"],
       },
-      boxWt: {
+      transactionId: {
         type: String,
         required: true,
-        default: "0",
       },
-      beads_balance:{
+      lossWt: {
         type: String,
         required: true,
-        default: "0",
       },
       createdBy: {
         type: String,
@@ -42,11 +36,6 @@ module.exports = function (fastify, opts, next) {
       modifiedBy: {
         type: String,
         required: false,
-      },
-      is_receiver_updated: {
-        type: Boolean,
-        required: true,
-        default: false,
       },
       is_deleted_flag: {
         type: Boolean,
@@ -60,6 +49,6 @@ module.exports = function (fastify, opts, next) {
     }
   );
 
-  mongoose.model("kareegar", kareegarSchema);
+  mongoose.model("loss", lossSchema);
   next();
 };
