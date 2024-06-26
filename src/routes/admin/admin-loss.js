@@ -83,8 +83,8 @@ fastify.get('/lossAcct-list', lossSchema, async (request, reply) => {
         page: parseInt(request.query.page) || 1,
         limit: parseInt(request.query.itemsPerPage) || 25
     }
-    const loss = await lossData.find({}, {}, options);
-    return loss;
+    const lossStock = await lossData.find({}, {}, options);
+    return lossStock;
 
 });
 
