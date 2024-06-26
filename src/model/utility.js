@@ -24,6 +24,22 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      meltingBookOpening995Balance: {
+        type: String,
+        required: false,
+      },
+      meltingBookClosing995Balance: {
+        type: String,
+        required: false,
+      },
+      meltingBookOpening100Balance: {
+        type: String,
+        required: false,
+      },
+      meltingBookClosing100Balance: {
+        type: String,
+        required: false,
+      },
       visible: {
         type: Boolean,
         required: true,
