@@ -8,7 +8,7 @@
     "start:dev": "nodemon --watch ./ --watch .env",
     "start": "node app"
   },
-  "author": "Ravi Shankar Dubey",
+  "author": "Vashesh Jogani",
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^7.0.0",

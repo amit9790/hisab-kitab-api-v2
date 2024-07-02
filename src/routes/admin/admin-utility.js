@@ -73,6 +73,8 @@ const updatUtilitySchema = {
             meltingBookClosing995Balance: { type: 'string' },
             meltingBookOpening100Balance: { type: 'string' },
             meltingBookClosing100Balance: { type: 'string' },
+            polishChatkaLoss: { type: 'string' },
+            polishLoss: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -112,6 +114,12 @@ fastify.patch('/update/utility', updatUtilitySchema, async (request, _reply) => 
         }
         if (request.body.meltingBookClosing100Balance){
             utilityBook_data.meltingBookClosing100Balance = request.body.meltingBookClosing100Balance;
+        }
+        if (request.body.polishChatkaLoss){
+            utilityBook_data.polishChatkaLoss = request.body.polishChatkaLoss;
+        }
+        if (request.body.polishLoss){
+            utilityBook_data.polishLoss = request.body.polishLoss;
         }
 
         const cleaned_utilityBook_data = removeEmpty(utilityBook_data);
