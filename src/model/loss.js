@@ -19,7 +19,7 @@ module.exports = function (fastify, opts, next) {
       type: {
         type: String,
         required: true,
-        enums: ["Melting", "Kareegar"],
+        enums: ["Melting", "Kareegar", "Polish"],
       },
       transactionId: {
         type: String,

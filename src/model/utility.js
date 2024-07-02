@@ -40,6 +40,14 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      polishChatkaLoss: {
+        type: String,
+        required: false,
+      },
+      polishLoss: {
+        type: String,
+        required: false,
+      },
       visible: {
         type: Boolean,
         required: true,
