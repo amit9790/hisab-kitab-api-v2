@@ -48,6 +48,10 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      polishFineLoss: {
+        type: String,
+        required: false,
+      },
       visible: {
         type: Boolean,
         required: true,
