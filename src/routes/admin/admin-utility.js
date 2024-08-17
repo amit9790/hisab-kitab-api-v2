@@ -75,6 +75,7 @@ const updatUtilitySchema = {
             meltingBookClosing100Balance: { type: 'string' },
             polishChatkaLoss: { type: 'string' },
             polishLoss: { type: 'string' },
+            polishFineLoss: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -119,6 +120,9 @@ fastify.patch('/update/utility', updatUtilitySchema, async (request, _reply) => 
             utilityBook_data.polishChatkaLoss = request.body.polishChatkaLoss;
         }
         if (request.body.polishLoss){
+            utilityBook_data.polishLoss = request.body.polishLoss;
+        }
+        if (request.body.polishFineLoss){
             utilityBook_data.polishLoss = request.body.polishLoss;
         }
 
