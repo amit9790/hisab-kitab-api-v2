@@ -11,7 +11,7 @@ module.exports = function (fastify, opts, next) {
       type: {
         type: String,
         required: true,
-        enums: ["issue", "receive"],
+        enums: ["issue", "receive", "issuereceive"],
       },
       date: {
         type: Date,
