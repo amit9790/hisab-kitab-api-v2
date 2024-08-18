@@ -4,7 +4,7 @@ const removeEmpty = require('../../utility/removeEmpty')
 
 module.exports = function (fastify, _opts, next) {
 
-const updateKareegarBookSchema = {
+const addKareegarBookSchema = {
     schema: {
         description: 'Admin only: Create entries in Kareegar Book',
         tags: ['Admin'],
@@ -26,13 +26,14 @@ const updateKareegarBookSchema = {
             beads_recv_wt: { type: 'string' },
             issuer: { type: 'string' },
             receiver: { type: 'string' },
+            is_receiver_updated: {type: 'string'},
             createdBy:  { type: 'string' },
             modifiedBy: { type: 'string'},
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
 }
-fastify.post('/kareegarBook', updateKareegarBookSchema, async (request, _reply) => {
+fastify.post('/kareegarBook', addKareegarBookSchema, async (request, _reply) => {
     // create the user
     const KareegarBook = mongoose.model('kareegar-book')
     const User = mongoose.model('User')
@@ -56,6 +57,7 @@ fastify.post('/kareegarBook', updateKareegarBookSchema, async (request, _reply) 
             beads_recv_wt: request.body.beads_recv_wt,
             issuer: request.body.issuer,
             receiver: request.body.receiver,
+            is_receiver_updated: request.body.is_receiver_updated,
             createdBy: request.user.email,
             modifiedBy: request.user.email,
             }
@@ -75,6 +77,58 @@ fastify.post('/kareegarBook', updateKareegarBookSchema, async (request, _reply) 
         console.log(e);
         // await newUser.deleteOne({_id: userId});
         // console.log("Deleted the user created")
+    }
+})
+
+
+const updateKareegarBookSchema = {
+    schema: {
+        description: 'Admin only: Create melting book',
+        tags: ['Admin'],
+        summary: 'todo',
+        security: [{apiKey: []}],
+    },
+    body: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+            recv_wt: { type: 'string' },
+            beads_recv_wt: { type: 'string' },
+            is_receiver_updated: {type: 'string'},
+            modifiedBy: { type: 'string'},
+        },
+    },
+    preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
+}
+
+fastify.patch('/update/kareegarBook', updateKareegarBookSchema, async (request, _reply) => {
+    // create the user
+    const KareegarBook = mongoose.model('kareegar-book')
+    try {
+        if(!request.body._id){
+            request.log.error(e.message)
+        }
+
+        const kareegarBook_data = {
+            recv_wt: request.body.recv_wt,
+            beads_recv_wt: request.body.beads_recv_wt,
+            is_receiver_updated: true,
+            modifiedBy: request.user.email,
+            }
+
+        const cleaned_kareegarBook_data = removeEmpty(kareegarBook_data);
+
+        await KareegarBook.findOneAndUpdate(
+            {_id: request.body._id},
+            cleaned_kareegarBook_data,
+            {useFindAndModify: true, upsert: true, new: true}
+        );
+
+        const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
+        return kareegarBook;
+    }
+    catch (e) {
+        console.log(e);
     }
 })
 
