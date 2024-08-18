@@ -67,6 +67,11 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      is_receiver_updated: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
       is_deleted_flag: {
         type: Boolean,
         required: true,
