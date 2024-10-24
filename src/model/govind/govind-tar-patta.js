@@ -16,6 +16,18 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: true,
       },
+      meltingWt: {
+        type: String,
+        required: true,
+      },
+      meltingId:{
+        type: String,
+        required: true,
+      },
+      weights: {
+        type: [String],
+        required: true,
+      },
       issue: {
         type: String,
         required: true,

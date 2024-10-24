@@ -17,10 +17,9 @@ module.exports = function (fastify, opts, next) {
         required: true,
         enums: ["Gold", "Bhuka"],
       },
-      description: {
+      meltingGoods: {
         type: String,
         required: true,
-        enums: ["issue", "receive"],
       },
       weight24k: {
         type: [String],

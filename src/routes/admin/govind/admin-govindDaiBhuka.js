@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require('uuid');
-const removeEmpty = require('../../utility/removeEmpty')
+const removeEmpty = require('../../../utility/removeEmpty')
 
 module.exports = function (fastify, _opts, next) {
 

@@ -6,6 +6,57 @@ module.exports = function (fastify, _opts, next) {
 
 const updateLossSchema = {
     schema: {
+        description: 'Admin only: Update loss acct',
+        tags: ['Admin'],
+        summary: 'todo',
+        security: [{apiKey: []}],
+    },
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+            type: { type: 'string' },
+            transactionId: { type: 'string' },
+            lossWt: { type: 'string' },
+            modifiedBy: { type: 'string' },
+        },
+    preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
+}
+fastify.patch('/lossAcct', updateLossSchema, async (request, _reply) => {
+    // create the user
+    const Loss = mongoose.model('loss')
+    
+    try {
+        if(!request.body.transactionId){
+            request.log.error(e.message);
+            return
+        }
+        const lossData = {
+            // created_by: request.body.created_by,
+            transactionId: request.body.transactionId,
+            modifiedBy: request.user.email,
+            lossWt:  request.body.lossWt,
+            type: request.body.type,
+            }
+
+        const cleaned_loss_data = removeEmpty(lossData);
+
+        await Loss.findOneAndUpdate(
+            {transactionId: request.body.transactionId, type: request.body.type},
+            cleaned_loss_data,
+            {useFindAndModify: true, upsert: true, new: true}
+        );
+
+        const loss = await Loss.find({}).populate('user_id', ['_id', 'email'])
+        return loss;
+    }
+    catch (e) {
+        console.log(e);
+    }
+})
+
+
+const addLossSchema = {
+    schema: {
         description: 'Admin only: Create loss acct',
         tags: ['Admin'],
         summary: 'todo',
@@ -26,7 +77,7 @@ const updateLossSchema = {
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
 }
-fastify.post('/lossAcct', updateLossSchema, async (request, _reply) => {
+fastify.post('/lossAcct', addLossSchema, async (request, _reply) => {
     // create the user
     const Loss = mongoose.model('loss')
     const User = mongoose.model('User')
