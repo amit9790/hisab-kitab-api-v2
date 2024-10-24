@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require('uuid');
-const removeEmpty = require('../../utility/removeEmpty')
+const removeEmpty = require('../../../utility/removeEmpty')
 
 module.exports = function (fastify, _opts, next) {
 
-const addDaiAccountBookSchema = {
+const addTarPattaBookSchema = {
     schema: {
         description: 'Admin only: Create Tar Patta book',
         tags: ['Admin'],
@@ -16,6 +16,9 @@ const addDaiAccountBookSchema = {
         additionalProperties: false,
         properties: {
             date: { type: 'string' },
+            meltingWt: { type: 'string' },
+            meltingId: { type: 'string' },
+            weights: { type: 'string' },
             goods: { type: 'string' },
             issue: { type: 'string' },
             receive: { type: 'string' },
@@ -25,15 +28,18 @@ const addDaiAccountBookSchema = {
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
 }
 
-fastify.post('/govindDaiAccountBook', addDaiAccountBookSchema, async (request, _reply) => {
+fastify.post('/govindTarPattaBook', addTarPattaBookSchema, async (request, _reply) => {
     // create the user
-    const GovindDaiAccountBook = mongoose.model('govind-dai-account');
-    const govindDaiAccountBookId = uuidv4();
+    const GovindTarPattaBook = mongoose.model('govind-tar-patta');
+    const govindTarPattaBookId = uuidv4();
     try {
 
-        const govindDaiAccountBook_data = {
-            govindDaiAccount_id: govindDaiAccountBookId,
+        const govindTarPattaBook_data = {
+            govindTarPatta_id: govindTarPattaBookId,
             date: request.body.date,
+            weights: request.body.weights,
+            meltingWt: request.body.meltingWt,
+            meltingId: request.body.meltingId,
             goods: request.body.goods,
             issue: request.body.issue,
             receive: request.body.receive,
@@ -42,25 +48,25 @@ fastify.post('/govindDaiAccountBook', addDaiAccountBookSchema, async (request, _
             is_receiver_updated: false
             }
 
-        const cleaned_govindDaiAccountBook_data = removeEmpty(govindDaiAccountBook_data);
+        const cleaned_govindTarPattaBook_data = removeEmpty(govindTarPattaBook_data);
 
-        await GovindDaiAccountBook.findOneAndUpdate(
-            {_id: govindDaiAccountBookId},
-            cleaned_govindDaiAccountBook_data,
+        await GovindTarPattaBook.findOneAndUpdate(
+            {_id: govindTarPattaBookId},
+            cleaned_govindTarPattaBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const govindDaiAccountBook = await GovindDaiAccountBook.find({}).populate('user_id', ['_id', 'email'])
-        return govindDaiAccountBook;
+        const govindTarPattaBook = await GovindTarPattaBook.find({}).populate('user_id', ['_id', 'email'])
+        return govindTarPattaBook;
     }
     catch (e) {
         console.log(e);
     }
 })
 
-const updateDaiAccountBookSchema = {
+const updateTarPattaBookSchema = {
     schema: {
-        description: 'Admin only: Update Dai Account Account book',
+        description: 'Admin only: Update Tar Patta book',
         tags: ['Admin'],
         summary: 'todo',
         security: [{apiKey: []}],
@@ -71,6 +77,7 @@ const updateDaiAccountBookSchema = {
         properties: {
             date: { type: 'string' },
             goods: { type: 'string' },
+            weights: { type: 'string' },
             issue: { type: 'string' },
             receive: { type: 'string' },
             loss: { type: 'string' },
@@ -79,40 +86,42 @@ const updateDaiAccountBookSchema = {
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
 }
 
-fastify.patch('/update/govindDaiAccountBook', updateDaiAccountBookSchema, async (request, _reply) => {
+fastify.patch('/update/govindTarPattaBook', updateTarPattaBookSchema, async (request, _reply) => {
     // create the user
-    const GovindDaiAccountBook = mongoose.model('govind-dai-account');
+    const GovindTarPattaBook = mongoose.model('govind-tar-patta');
     try {
         if(!request.body._id){
             request.log.error(e.message)
         }
 
-        const govindDaiAccountBook_data = {
+        const govindTarPattaBook_data = {
+            weights: request.body.weights,
+            issue: request.body.issue,
             receive: request.body.receive,
             loss: request.body.loss,
             is_receiver_updated: true,
             modifiedBy: request.user.email,
             }
 
-        const cleaned_govindDaiAccountBook_data = removeEmpty(govindDaiAccountBook_data);
+        const cleaned_govindTarPattaBook_data = removeEmpty(govindTarPattaBook_data);
 
-        await GovindDaiAccountBook.findOneAndUpdate(
+        await GovindTarPattaBook.findOneAndUpdate(
             {_id: request.body._id},
-            cleaned_govindDaiAccountBook_data,
+            cleaned_govindTarPattaBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const govindDaiAccountBook = await GovindDaiAccountBook.find({}).populate('user_id', ['_id', 'email'])
-        return govindDaiAccountBook;
+        const govindTarPattaBook = await GovindTarPattaBook.find({}).populate('user_id', ['_id', 'email'])
+        return govindTarPattaBook;
     }
     catch (e) {
         console.log(e);
     }
 })
 
-const DaiAccountBookListSchema = {
+const tarPattaBookListSchema = {
     schema: {
-        description: 'Admin only: Create Dai Account account books',
+        description: 'Admin only: Create tar patta books',
         tags: ['Admin'],
         summary: 'todo',
         security: [{apiKey: []}],
@@ -124,22 +133,22 @@ const DaiAccountBookListSchema = {
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
 }
 
-fastify.get('/govindDaiAccountStock-list', DaiAccountBookListSchema, async (request, reply) => {
+fastify.get('/govindTarPattaStock-list', tarPattaBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
-    const GovindDaiAccountBook = mongoose.model('govind-dai-account')
+    const GovindTarPattaBook = mongoose.model('govind-tar-patta')
     const options = {
         page: parseInt(request.query.page) || 1,
         limit: parseInt(request.query.itemsPerPage) || 25
     }
-    const govindDaiAccountBooks = await GovindDaiAccountBook.find({}, {}, options);
-    return govindDaiAccountBooks;
+    const govindTarPattaBooks = await GovindTarPattaBook.find({}, {}, options);
+    return govindTarPattaBooks;
 
 });
 
 
-const DaiAccountBookDeleteSchema = {
+const tarPattaBookDeleteSchema = {
     schema: {
-        description: 'Admin only: soft delete the Dai Account Account book and associated user account',
+        description: 'Admin only: soft delete the tar patta book and associated user account',
         tags: ['Admin'],
         summary: 'todo',
         security: [{apiKey: []}],
@@ -154,10 +163,10 @@ const DaiAccountBookDeleteSchema = {
     },
     preHandler: fastify.auth([fastify.jwtAuth,fastify.isAdmin], {relation: 'and'})
 }
-fastify.post('/govindDaiAccountBookDelete', DaiAccountBookDeleteSchema, async (request, reply) => {
-    const GovindDaiAccountBook = mongoose.model('govind-dai-account')
+fastify.post('/govindTarPattaBookDelete', tarPattaBookDeleteSchema, async (request, reply) => {
+    const GovindTarPattaBook = mongoose.model('govind-tar-patta')
     console.log(request.body);
-    const govindDaiAccountInfo = await GovindDaiAccountBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
+    const govindTarPattaBookInfo = await GovindTarPattaBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};
 });
