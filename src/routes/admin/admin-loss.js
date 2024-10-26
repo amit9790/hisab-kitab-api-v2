@@ -14,9 +14,12 @@ const updateLossSchema = {
         type: 'object',
         additionalProperties: false,
         properties: {
+            date: { type: 'string' },
+            description: { type: 'string' },
             type: { type: 'string' },
             transactionId: { type: 'string' },
             lossWt: { type: 'string' },
+            createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
         },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -31,10 +34,13 @@ fastify.patch('/lossAcct', updateLossSchema, async (request, _reply) => {
             return
         }
         const lossData = {
-            // created_by: request.body.created_by,
+            date: request.body.date,
             transactionId: request.body.transactionId,
+            description: request.body.description,
             modifiedBy: request.user.email,
             lossWt:  request.body.lossWt,
+            createdBy: request.user.email,
+            modifiedBy: request.user.email,
             type: request.body.type,
             }
 
