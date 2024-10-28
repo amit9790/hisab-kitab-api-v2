@@ -52,6 +52,11 @@ module.exports = function (fastify, opts, next) {
         required: true,
         default: false,
       },
+      is_hidden_flag: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
       is_deleted_flag: {
         type: Boolean,
         required: true,

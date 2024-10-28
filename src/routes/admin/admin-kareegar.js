@@ -22,6 +22,7 @@ const addKareegarSchema = {
             beads_balance: { type: 'string' },
             boxWt: { type: 'string' },
             kareegarCutoffDate: { type: 'string'},
+            is_hidden_flag: { type: 'string'},
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -38,6 +39,7 @@ fastify.post('/kareegar', addKareegarSchema, async (request, _reply) => {
             name: request.body.name,
             description: request.body.description,
             category: request.body.category,
+            is_hidden_flag: request.body.is_hidden_flag,
             kareegarCutoffDate: request.body.kareegarCutoffDate,
             createdBy: request.user.email,
             }
@@ -75,6 +77,7 @@ const updateKareegarSchema = {
             createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
             kareegarCutoffDate: { type: 'string'},
+            is_hidden_flag: { type: 'string'},
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -93,6 +96,7 @@ fastify.patch('/update/kareegar', updateKareegarSchema, async (request, _reply) 
             name: request.body.name,
             description: request.body.description,
             category: request.body.category,
+            is_hidden_flag: request.body.is_hidden_flag,
             kareegarCutoffDate: request.body.kareegarCutoffDate,
             modifiedBy: request.user.email,
             }

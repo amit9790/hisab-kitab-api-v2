@@ -165,47 +165,99 @@ module.exports = function (fastify, opts, next) {
         required: true,
       },
       solderDate: {
-        type: Date,
+        type: [Date],
         required: true,
       },
       solderLotNo:{
-        type: String,
+        type: [String],
         required: false,  
       },
       solderItem:{
-        type: String,
+        type: [String],
         required: false,  
       },
       solderMelting:{
-        type: String,
+        type: [String],
         required: false,  
       },
       solderChainIssue: {
-        type: String,
+        type: [String],
         required: false,
       },
       solderChainReceive: {
-        type: String,
+        type: [String],
         required: false,
       },
       solderBhuka: {
-        type: String,
+        type: [String],
         required: false,
       },
       solderTotal: {
-        type: String,
+        type: [String],
         required: false,
       },
       solderPowder: {
-        type: String,
+        type: [String],
         required: false,
       },
       solderR1: {
-        type: String,
+        type: [String],
         required: false,
       },
       solderR2: {
-        type: String,
+        type: [String],
+        required: false,
+      },
+      is_solder_updated: {
+        type: [String],
+        required: false,
+      },
+      jointDate: {
+        type: [Date],
+        required: true,
+      },
+      jointLotNo:{
+        type: [String],
+        required: false,  
+      },
+      jointItem:{
+        type: [String],
+        required: false,  
+      },
+      jointMelting:{
+        type: [String],
+        required: false,  
+      },
+      jointChainIssue: {
+        type: [String],
+        required: false,
+      },
+      jointChainReceive: {
+        type: [String],
+        required: false,
+      },
+      jointBhuka: {
+        type: [String],
+        required: false,
+      },
+      jointTotal: {
+        type: [String],
+        required: false,
+      },
+      jointPowder: {
+        type: [String],
+        required: false,
+      },
+      jointR1: {
+        type: [String],
+        required: false,
+      },
+      jointR2: {
+        type: [String],
+        required: false,
+      },
+      is_joint_updated: {
+        type: [String],
         required: false,
       },
       user_id: { type: Schema.Types.ObjectId, ref: "User" },
