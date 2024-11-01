@@ -40,6 +40,11 @@ const addGovindBookSchema = {
             daiBhukaDescription: { type: 'string' },
             daiBhukaDai: { type: 'string' },
             daiBhukaBhuka: { type: 'string' },
+            daiBhuka835Date: { type: 'string' },
+            daiBhuka835Description: { type: 'string' },
+            daiBhuka835Dai: { type: 'string' },
+            daiBhuka835Bhuka: { type: 'string' },
+            is_assigned_to: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -79,7 +84,12 @@ fastify.post('/govindBook', addGovindBookSchema, async (request, _reply) => {
             daiBhukaDescription: request.body.daiBhukaDescription,
             daiBhukaDai: request.body.daiBhukaDai,
             daiBhukaBhuka: request.body.daiBhukaBhuka,
-            is_receiver_updated: false
+            daiBhuka835Date: request.body.daiBhuka835Date,
+            daiBhuka835Description: request.body.daiBhuka835Description,
+            daiBhuka835Dai: request.body.daiBhuka835Dai,
+            daiBhuka835Bhuka: request.body.daiBhuka835Bhuka,
+            is_assigned_to: request.body.is_assigned_to,
+            is_receiver_updated: false,
             }
 
         const cleaned_govindBook_data = removeEmpty(govindBook_data);
@@ -135,6 +145,11 @@ const updateGovindBookSchema = {
             daiBhukaDescription: { type: 'string' },
             daiBhukaDai: { type: 'string' },
             daiBhukaBhuka: { type: 'string' },
+            daiBhuka835Date: { type: 'string' },
+            daiBhuka835Description: { type: 'string' },
+            daiBhuka835Dai: { type: 'string' },
+            daiBhuka835Bhuka: { type: 'string' },
+            is_assigned_to: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -175,9 +190,14 @@ fastify.patch('/update/govindBook', updateGovindBookSchema, async (request, _rep
             daiBhukaDescription: request.body.daiBhukaDescription,
             daiBhukaDai: request.body.daiBhukaDai,
             daiBhukaBhuka: request.body.daiBhukaBhuka,
+            daiBhuka835Date: request.body.daiBhuka835Date,
+            daiBhuka835Description: request.body.daiBhuka835Description,
+            daiBhuka835Dai: request.body.daiBhuka835Dai,
+            daiBhuka835Bhuka: request.body.daiBhuka835Bhuka,
             is_melting_receiver_updated: request.body.is_melting_receiver_updated,
             is_deleted_flag: request.body.is_deleted_flag,
             is_tarpatta_deleted_flag: request.body.is_tarpatta_deleted_flag,
+            is_assigned_to: request.body.is_assigned_to,
             modifiedBy: request.user.email,
         }
 

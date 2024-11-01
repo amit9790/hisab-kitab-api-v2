@@ -113,6 +113,10 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: true,
       },
+      is_assigned_to: {
+        type: String,
+        required: true,
+      },
       daiBhukaDate:{
         type: Date,
         required: true,
@@ -126,6 +130,22 @@ module.exports = function (fastify, opts, next) {
         required: true,
       },
       daiBhukaBhuka: {
+        type: [String],
+        required: true,
+      },
+      daiBhuka835Date:{
+        type: Date,
+        required: true,
+      },
+      daiBhuka835Description: {
+        type: String,
+        required: false,
+      },
+      daiBhuka835Dai: {
+        type: [String],
+        required: true,
+      },
+      daiBhuka835Bhuka: {
         type: [String],
         required: true,
       },
