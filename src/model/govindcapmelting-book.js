@@ -7,27 +7,49 @@ module.exports = function (fastify, opts, next) {
   const govindStockSchema = new mongoose.Schema(
     {
       _id: {type: String, default:  () => { let res = uuidv4(); return res.id}, alias: "govindBook_id" },
-      capAcctDate: {
+
+      meltingDate: {
         type: Date,
         required: true,
       },
-      capAcctType: {
-        type: String,
-        required: false,
+      meltingCategory: {
+        type: [String],
+        required: true,
+        enums: ["Gold", "Bhuka"],
       },
-      capAcctDescription: {
-        type: String,
-        required: false,
-      },
-      capAcctIssue: {
+      meltingDescription: {
         type: String,
         required: true,
       },
-      capAcctReceive: {
+      meltingWeight: {
+        type: [String],
+        required: true,
+      },
+      meltingPurity: {
+        type: [String],
+        required: false,
+      },
+      meltingConversion: {
+        type: [String],
+        required: false,
+      },
+      meltingIssue: {
         type: String,
         required: true,
       },
-      capAcctLoss: {
+      meltingIssueActual: {
+        type: String,
+        required: true,
+      },
+      meltingReceive: {
+        type: String,
+        required: true,
+      },
+      meltingBhuka: {
+        type: String,
+        required: true,
+      },
+      meltingLoss: {
         type: String,
         required: true,
       },
@@ -39,7 +61,7 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
-      is_receiver_updated: {
+      is_melting_receiver_updated: {
         type: Boolean,
         required: true,
         default: false,
@@ -56,6 +78,6 @@ module.exports = function (fastify, opts, next) {
     }
   );
 
-  mongoose.model("govindcap-book", govindStockSchema);
+  mongoose.model("govindcapmelting-book", govindStockSchema);
   next();
 };
