@@ -53,7 +53,7 @@ fastify.post('/govindCapAcctBook', addGovindCapAcctBookSchema, async (request, _
         );
 
         const govindBook = await GovindBook.find({}).populate('user_id', ['_id', 'email'])
-        return govindBook;
+        return govindBook_data;
     }
     catch (e) {
         console.log(e);
