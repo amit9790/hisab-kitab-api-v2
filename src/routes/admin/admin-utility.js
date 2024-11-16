@@ -168,5 +168,23 @@ fastify.get('/utility-list', utilityListSchema, async (request, reply) => {
 
 });
 
+
+const utitlityDeleteSchema = {
+    schema: {
+        description: 'Admin only: soft delete the utility book and associated user account',
+        tags: ['Admin'],
+        summary: 'todo',
+        security: [{apiKey: []}],
+    },
+    preHandler: fastify.auth([fastify.jwtAuth,fastify.isAdmin], {relation: 'and'})
+}
+fastify.post('/utilityDelete', utitlityDeleteSchema, async (request, reply) => {
+    const UtilityBook = mongoose.model('utility');
+    const utilityData = await UtilityBook.find({});
+    const utilityStockInfo = await UtilityBook.updateMany({ _id: utilityData[0]["_id"] }, {visible: false}, { multi: true });
+    // console.log(masterStockInfo);
+    return {success: true, message: 'utility data deleted'};
+});
+
 next();
 }
