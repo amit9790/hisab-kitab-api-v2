@@ -133,6 +133,26 @@ module.exports = function (fastify, opts, next) {
         type: [String],
         required: true,
       },
+      machine835Date: {
+        type: Date,
+        required: true,
+      },
+      machine835Description: {
+        type: String,
+        required: false,
+      },
+      machine835Issue: {
+        type: [String],
+        required: true,
+      },
+      machine835Receive: {
+        type: String,
+        required: true,
+      },
+      machine835Loss: {
+        type: String,
+        required: true,
+      },
       daiBhuka835Date:{
         type: Date,
         required: true,
