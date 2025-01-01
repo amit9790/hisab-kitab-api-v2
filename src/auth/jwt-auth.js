@@ -26,6 +26,33 @@ const jwtAuth = function (fastify, _opts, next) {
                         if (!user) {
                             return reply.code(401).send({message: 'Unauthorized'})
                         }
+
+                        // Check Visibility Status
+                        async function fetchUtilities() {
+                            try {
+                                const utilities = mongoose.model('utility')
+                                // Execute the query by awaiting it
+                                const utilitiesList = await utilities.find();
+                                // console.log("Utilities List:", utilitiesList); // Logs the full list of documents
+                                return utilitiesList[0]['visible'];
+                            } catch (err) {
+                                console.error("Error fetching utilities:", err);
+                                return false;
+                            }
+                        };
+                        fetchUtilities()
+                        .then(visibility => {
+                            // console.log("Fetched Utilities:", visibility);
+                            if (!visibility){
+                                // console.log("Visibility False")
+                                return reply.code(401).send({message: 'Unauthorised'})
+                            }
+                        })
+                        .catch(err => {
+                            // console.error("Error fetching utilities:", err);
+                            return reply.code(503).send({message: 'Unknown Error'})
+                        });
+
                         //special case for admin user as we need to display the send email to only admin
                         let isAdminUser = false;
                         if (user.roles && user.roles.includes('ROLE_ADMIN')) {
