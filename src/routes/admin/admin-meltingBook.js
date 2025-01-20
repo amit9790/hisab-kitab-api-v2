@@ -87,6 +87,12 @@ const updatMeltingBookSchema = {
             modifiedBy: { type: 'string' },
             receive22k: { type: 'string' },
             loss22k: { type: 'string' },
+            tarpattaDate: { type: 'string' },
+            tarpattaDescription: { type: 'string' },
+            tarpattaIssue: { type: 'string' },
+            tarpattaReceive: { type: 'string' },
+            tarpattaBhuka: { type: 'string' },
+            tarpattaLoss: { type: 'string' },
 
         },
     },
@@ -106,6 +112,12 @@ fastify.patch('/update/meltingBook', updatMeltingBookSchema, async (request, _re
             loss22k: request.body.loss22k,
             is_receiver_updated: true,
             modifiedBy: request.user.email,
+            tarpattaDate: request.body.tarpattaDate,
+            tarpattaDescription: request.body.tarpattaDescription,
+            tarpattaIssue: request.body.tarpattaIssue,
+            tarpattaReceive: request.body.tarpattaReceive,
+            tarpattaBhuka: request.body.tarpattaBhuka,
+            tarpattaLoss: request.body.tarpattaLoss,
             }
 
         const cleaned_meltingBook_data = removeEmpty(meltingBook_data);

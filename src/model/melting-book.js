@@ -51,6 +51,30 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: true,
       },
+      tarpattaDate: {
+        type: Date,
+        required: true,
+      },
+      tarpattaDescription: {
+        type: String,
+        required: false,
+      },
+      tarpattaIssue: {
+        type: [String],
+        required: true,
+      },
+      tarpattaReceive: {
+        type: [String],
+        required: true,
+      },
+      tarpattaBhuka: {
+        type: [String],
+        required: true,
+      },
+      tarpattaLoss: {
+        type: String,
+        required: true,
+      },
       createdBy: {
         type: String,
         required: false,
