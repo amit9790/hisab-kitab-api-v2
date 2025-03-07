@@ -184,7 +184,7 @@ const babuBookMeltingDeleteSchema = {
 }
 fastify.post('/babuAcctBookMeltingDelete', babuBookMeltingDeleteSchema, async (request, reply) => {
     const BabuBook = mongoose.model('babumelting-book')
-    console.log(request.body);
+    //console.log(request.body);
     const babuStockInfo = await BabuBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};

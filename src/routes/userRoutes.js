@@ -229,7 +229,7 @@ module.exports = function (fastify, opts, next) {
       );
       reply.send({ success: true, message: 'Updated successfully' })
     } catch (e) {
-      console.log('Reset token is expired / invalid');
+      //console.log('Reset token is expired / invalid');
       reply.code(409).send({ success: false, message: 'Reset token is expired / invalid' })
     }
   })

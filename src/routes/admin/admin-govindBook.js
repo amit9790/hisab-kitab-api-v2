@@ -283,7 +283,7 @@ const govindBookMeltingDeleteSchema = {
 }
 fastify.post('/govindBookMeltingDelete', govindBookMeltingDeleteSchema, async (request, reply) => {
     const GovindBook = mongoose.model('govind-book')
-    console.log(request.body);
+    //console.log(request.body);
     const govindStockInfo = await GovindBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};
@@ -308,7 +308,7 @@ const govindBookTarpattaDeleteSchema = {
 }
 fastify.post('/govindBookTarpattaDelete', govindBookTarpattaDeleteSchema, async (request, reply) => {
     const GovindBook = mongoose.model('govind-book')
-    console.log(request.body);
+    // console.log(request.body);
     const govindStockInfo = await GovindBook.updateMany({ _id: request.body._id }, {is_tarpatta_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};
