@@ -35,9 +35,18 @@ module.exports = function (fastify, opts, next) {
         required: true,
         default: "0",
       },
-      kareegarCutoffDate: {
-        type: Date,
+      kareegarCutoffDateNumber: {
+        type: Number,
         required: true,
+        default: 0
+      },
+      kareegarCutoffStartDate: {
+        type: [Date],
+        required: true,
+      },
+      kareegarCutoffEndDate: {
+        type: [Date],
+        required: false,
       },
       createdBy: {
         type: String,

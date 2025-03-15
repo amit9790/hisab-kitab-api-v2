@@ -11,7 +11,6 @@ module.exports = function (fastify, opts, next) {
       kareegar_id: {
         type: String,
         required: true,
-        enums: ["issue", "receive"],
       },
       type: {
         type: String,
@@ -72,10 +71,20 @@ module.exports = function (fastify, opts, next) {
         required: true,
         default: true,
       },
+      is_editable_flag: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
       is_deleted_flag: {
         type: Boolean,
         required: true,
         default: false,
+      },
+      cutoffDateNumber:{
+        type: Number,
+        required: true,
+        default: 0,
       },
       user_id: { type: Schema.Types.ObjectId, ref: "User" },
     },

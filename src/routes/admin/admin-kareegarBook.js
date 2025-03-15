@@ -25,6 +25,7 @@ const addKareegarBookSchema = {
             beads_issue_wt: { type: 'string' },
             beads_recv_wt: { type: 'string' },
             issuer: { type: 'string' },
+            cutoffDateNumber: { type: 'string' },
             receiver: { type: 'string' },
             is_receiver_updated: {type: 'string'},
             createdBy:  { type: 'string' },
@@ -57,6 +58,7 @@ fastify.post('/kareegarBook', addKareegarBookSchema, async (request, _reply) => 
             beads_recv_wt: request.body.beads_recv_wt,
             issuer: request.body.issuer,
             receiver: request.body.receiver,
+            cutoffDateNumber: request.body.cutoffDateNumber,
             is_receiver_updated: request.body.is_receiver_updated,
             createdBy: request.user.email,
             modifiedBy: request.user.email,
@@ -159,7 +161,10 @@ fastify.get('/kareegarBook-list', kareegarBookListSchema, async (request, reply)
         kareegar_id: request.query.kareegar_id
     };
 
-    const KareegarBooks = await KareegarBook.find(kareegarIdFilter, {}, options);
+    // To query limited data and get pagination
+    // const KareegarBooks = await KareegarBook.find(kareegarIdFilter, {}, options);
+    
+    const KareegarBooks = await KareegarBook.find(kareegarIdFilter, {});
     return KareegarBooks;
 });
 
@@ -182,10 +187,54 @@ const kareegarBookDeleteSchema = {
 }
 fastify.post('/kareegarBookDelete', kareegarBookDeleteSchema, async (request, reply) => {
     const KareegarBook = mongoose.model('kareegar-book')
-    console.log(request.body);
+    //console.log(request.body);
     const KareegarBookInfo = await KareegarBook.updateMany({ _id: request.body.kareegarBookId }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'User deleted'};
+});
+
+const kareegarBookCloseSchema = {
+    schema: {
+        description: 'Admin only: soft delete the KareegarBook and associated user account',
+        tags: ['Admin'],
+        summary: 'todo',
+        security: [{apiKey: []}],
+    },
+    consumes: ['multipart/form-data'],
+    body: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+            kareegar_id: { type: "string"},
+            cutoffDateNumber: { type: "number" },
+        },
+    },
+    preHandler: fastify.auth([fastify.jwtAuth,fastify.isAdmin], {relation: 'and'})
+}
+fastify.patch('/kareegarBookClose', kareegarBookCloseSchema, async (request, reply) => {
+    const KareegarBook = mongoose.model('kareegar-book')
+    // console.log("close Kareegar Book");
+    // console.log("request",request.body);
+    const allDocs = await KareegarBook.find({});
+    // console.log(allDocs);
+
+    if (request.body.cutoffDateNumber === '0'){
+        request.log.error("cutoffDateNumber Incorrect");
+    }
+        
+    // Update all KareegarBooks with cutoffDateNumber = 0
+    const result = await KareegarBook.updateMany(
+        { kareegar_id: request.body.kareegar_id, cutoffDateNumber: 0, $or: [{ is_editable_flag: true }, { is_editable_flag: { $exists: false } }]},
+        { $set: { cutoffDateNumber: request.body.cutoffDateNumber, is_editable_flag:false } }
+    );
+    console.log(result.modifiedCount);
+
+    return reply.send({
+        success: true,
+        message: 'Closed KareegarBooks successfully',
+        modifiedCount: result.modifiedCount,
+    });
+
 });
 
 next();
