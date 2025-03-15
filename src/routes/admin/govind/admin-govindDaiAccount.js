@@ -156,7 +156,7 @@ const DaiAccountBookDeleteSchema = {
 }
 fastify.post('/govindDaiAccountBookDelete', DaiAccountBookDeleteSchema, async (request, reply) => {
     const GovindDaiAccountBook = mongoose.model('govind-dai-account')
-    console.log(request.body);
+    //console.log(request.body);
     const govindDaiAccountInfo = await GovindDaiAccountBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};

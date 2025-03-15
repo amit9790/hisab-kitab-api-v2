@@ -356,7 +356,7 @@ const vijayBookMeltingDeleteSchema = {
 }
 fastify.post('/vijayBookMeltingDelete', vijayBookMeltingDeleteSchema, async (request, reply) => {
     const VijayBook = mongoose.model('vijay-book')
-    console.log(request.body);
+    //console.log(request.body);
     const vijayStockInfo = await VijayBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};
@@ -381,7 +381,7 @@ const vijayBookTarpattaDeleteSchema = {
 }
 fastify.post('/vijayBookTarpattaDelete', vijayBookTarpattaDeleteSchema, async (request, reply) => {
     const VijayBook = mongoose.model('vijay-book')
-    console.log(request.body);
+    //console.log(request.body);
     const vijayStockInfo = await VijayBook.updateMany({ _id: request.body._id }, {is_tarpatta_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};

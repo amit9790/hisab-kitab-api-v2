@@ -165,7 +165,7 @@ const tarPattaBookDeleteSchema = {
 }
 fastify.post('/govindTarPattaBookDelete', tarPattaBookDeleteSchema, async (request, reply) => {
     const GovindTarPattaBook = mongoose.model('govind-tar-patta')
-    console.log(request.body);
+    //console.log(request.body);
     const govindTarPattaBookInfo = await GovindTarPattaBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};

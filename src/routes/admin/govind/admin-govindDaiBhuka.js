@@ -156,7 +156,7 @@ const DaiBhukaBookDeleteSchema = {
 }
 fastify.post('/govindDaiBhukaBookDelete', DaiBhukaBookDeleteSchema, async (request, reply) => {
     const GovindDaiBhukaBook = mongoose.model('govind-dai-bhuka')
-    console.log(request.body);
+    //console.log(request.body);
     const govindDaiBhukaInfo = await GovindDaiBhukaBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};

@@ -65,7 +65,7 @@ module.exports = function (fastify, opts, next) {
         const MasterStock = mongoose.model('master-stock')
         const User = mongoose.model('User')
         let existingMasterStock;
-        console.log(request.headers);
+        //console.log(request.headers);
         if (request.isAdminUser) {
             if (!request.headers.masterstock_id) {
                 return { success: false, message: 'Missing masterStock_id  in header' };
@@ -102,7 +102,7 @@ module.exports = function (fastify, opts, next) {
             }
             let masterStock
             if (!existingMasterStock) {
-                console.log("Tesing the provider");
+                //console.log("Tesing the provider");
                 masterStock = await MasterStock.findOneAndUpdate(
                     { _id },
                     cleaned_masterStock_data,
