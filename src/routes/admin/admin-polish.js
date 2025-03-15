@@ -116,7 +116,7 @@ const polishDeleteSchema = {
 }
 fastify.post('/polishDelete', polishDeleteSchema, async (request, reply) => {
     const Polish = mongoose.model('polish')
-    console.log(request.body);
+    //console.log(request.body);
     const polishInfo = await Polish.updateMany({ _id: request.body.polishId }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'User deleted'};

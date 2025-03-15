@@ -156,7 +156,7 @@ const machineAccountBookDeleteSchema = {
 }
 fastify.post('/govindMachineAccountBookDelete', machineAccountBookDeleteSchema, async (request, reply) => {
     const GovindMachineAccountBook = mongoose.model('govind-machine-account')
-    console.log(request.body);
+    //console.log(request.body);
     const govindMachineAccountInfo = await GovindMachineAccountBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};
