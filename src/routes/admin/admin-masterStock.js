@@ -120,7 +120,7 @@ const masterStockDeleteSchema = {
 }
 fastify.post('/masterStockDelete', masterStockDeleteSchema, async (request, reply) => {
     const MasterStock = mongoose.model('master-stock')
-    console.log(request.body);
+    //console.log(request.body);
     const masterStockInfo = await MasterStock.updateMany({ _id: request.body.masterstockId }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'User deleted'};

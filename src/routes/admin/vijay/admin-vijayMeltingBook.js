@@ -169,7 +169,7 @@ const meltingBookDeleteSchema = {
 }
 fastify.post('/vijayMeltingBookDelete', meltingBookDeleteSchema, async (request, reply) => {
     const GovindMeltingBook = mongoose.model('vijay-melting-book')
-    console.log(request.body);
+    //console.log(request.body);
     const vijayMeltingBookInfo = await GovindMeltingBook.updateMany({ _id: request.body._id }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'stock deleted'};

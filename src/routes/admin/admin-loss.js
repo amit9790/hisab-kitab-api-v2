@@ -140,7 +140,8 @@ fastify.get('/lossAcct-list', lossSchema, async (request, reply) => {
         page: parseInt(request.query.page) || 1,
         limit: parseInt(request.query.itemsPerPage) || 25
     }
-    const lossStock = await lossData.find({}, {}, options);
+    // const lossStock = await lossData.find({}, {}, options);
+    const lossStock = await lossData.find({}, {});
     return lossStock;
 
 });
@@ -164,7 +165,7 @@ const lossDeleteSchema = {
 }
 fastify.post('/lossAcctDelete', lossDeleteSchema, async (request, reply) => {
     const lossData = mongoose.model('loss')
-    console.log(request.body);
+    //console.log(request.body);
     const lossInfo = await lossData.updateMany({ _id: request.body.lossId }, {is_deleted_flag: true}, { multi: true })
     // console.log(masterStockInfo);
     return {success: true, message: 'User deleted'};
