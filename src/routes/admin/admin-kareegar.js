@@ -21,7 +21,9 @@ const addKareegarSchema = {
             balance: { type: 'string' },
             beads_balance: { type: 'string' },
             boxWt: { type: 'string' },
-            kareegarCutoffDate: { type: 'string'},
+            kareegarCutoffDateNumber: { type: 'string' },
+            kareegarCutoffStartDate: { type: 'string' },
+            kareegarCutoffEndDate:{ type: 'string' },
             is_hidden_flag: { type: 'string'},
         },
     },
@@ -33,14 +35,15 @@ fastify.post('/kareegar', addKareegarSchema, async (request, _reply) => {
     const Kareegar = mongoose.model('kareegar');
     const kareegarId = uuidv4();
     try {
-
         const kareegar_data = {
             kareegar_id: kareegarId,
             name: request.body.name,
             description: request.body.description,
             category: request.body.category,
             is_hidden_flag: request.body.is_hidden_flag,
-            kareegarCutoffDate: request.body.kareegarCutoffDate,
+            kareegarCutoffDateNumber: request.body.kareegarCutoffDateNumber,
+            kareegarCutoffStartDate: request.body.kareegarCutoffStartDate,
+            kareegarCutoffEndDate: request.body.kareegarCutoffEndDate,
             createdBy: request.user.email,
             }
 
@@ -76,7 +79,9 @@ const updateKareegarSchema = {
             description: { type: 'string' },
             createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
-            kareegarCutoffDate: { type: 'string'},
+            kareegarCutoffDateNumber: { type: 'string' },
+            kareegarCutoffStartDate: { type: 'string' },
+            kareegarCutoffEndDate:{ type: 'string' },
             is_hidden_flag: { type: 'string'},
         },
     },
@@ -97,7 +102,9 @@ fastify.patch('/update/kareegar', updateKareegarSchema, async (request, _reply) 
             description: request.body.description,
             category: request.body.category,
             is_hidden_flag: request.body.is_hidden_flag,
-            kareegarCutoffDate: request.body.kareegarCutoffDate,
+            kareegarCutoffDateNumber: request.body.kareegarCutoffDateNumber,
+            kareegarCutoffStartDate: request.body.kareegarCutoffStartDate,
+            kareegarCutoffEndDate: request.body.kareegarCutoffEndDate,
             modifiedBy: request.user.email,
             }
 
@@ -191,7 +198,9 @@ fastify.get('/kareegar-list', kareegarListSchema, async (request, reply) => {
         page: parseInt(request.query.page) || 1,
         limit: parseInt(request.query.itemsPerPage) || 25
     }
-    const kareegars = await Kareegar.find({}, {}, options);
+    //const kareegars = await Kareegar.find({}, {}, options);
+    const kareegars = await Kareegar.find({});
+    //const kareegars = await Kareegar.find({}, {}, options);
     return kareegars;
 
 });
