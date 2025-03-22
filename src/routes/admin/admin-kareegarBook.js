@@ -221,13 +221,21 @@ fastify.patch('/kareegarBookClose', kareegarBookCloseSchema, async (request, rep
     if (request.body.cutoffDateNumber === '0'){
         request.log.error("cutoffDateNumber Incorrect");
     }
-        
+
     // Update all KareegarBooks with cutoffDateNumber = 0
     const result = await KareegarBook.updateMany(
-        { kareegar_id: request.body.kareegar_id, cutoffDateNumber: 0, $or: [{ is_editable_flag: true }, { is_editable_flag: { $exists: false } }]},
+        { kareegar_id: request.body.kareegar_id, 
+            $or: [
+                { cutoffDateNumber: 0 },
+                { cutoffDateNumber: { $exists: false } }
+            ], 
+          $or: [
+            { is_editable_flag: true }, 
+            { is_editable_flag: { $exists: false } }
+            ]},
         { $set: { cutoffDateNumber: request.body.cutoffDateNumber, is_editable_flag:false } }
     );
-    console.log(result.modifiedCount);
+    //console.log(result.modifiedCount);
 
     return reply.send({
         success: true,
