@@ -83,7 +83,8 @@ const masterStockListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" }
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -92,13 +93,65 @@ const masterStockListSchema = {
 fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const MasterStock = mongoose.model('master-stock')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    const masterStocks = await MasterStock.find({}, {}, options);
-    return masterStocks;
+    // For all data
+    // const options = {
+    //     page: parseInt(request.query.page) || 1,
+    //     limit: parseInt(request.query.itemsPerPage) || 25
+    // }
+    // const masterStocks = await MasterStock.find({}, {}, options);
 
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+    
+    if (state==="all"){
+        // Fetch paginated records
+        const masterStocksTest = await MasterStock.find({})
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await MasterStock.countDocuments({});
+
+        const totalQty = await MasterStock.aggregate([
+            { $match: { is_deleted_flag: false } },
+            {
+              $group: {
+                _id: null,
+                weight: { $sum: "$weight" },
+                receive22k: { $sum: "$receive22k" },
+                issue22k: { $sum: "$issue22k" }
+              }
+            }
+          ]);
+    
+        return {"data": masterStocksTest, "count": totalCount, "totalQty": totalQty};
+    }
+
+    const boolean = (state === "deleted");
+
+    // Fetch paginated records
+    const masterStocksTest = await MasterStock.find({is_deleted_flag: boolean})
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await MasterStock.countDocuments({is_deleted_flag: boolean});
+    
+    const totalQty = await MasterStock.aggregate([
+        { $match: { is_deleted_flag: false } },
+        {
+          $group: {
+            _id: null,
+            weight: { $sum: "$weight" },
+            receive22k: { $sum: "$receive22k" },
+            issue22k: { $sum: "$issue22k" }
+          }
+        }
+      ]);
+
+    return {"data": masterStocksTest, "count": totalCount, "totalQty": totalQty};
 });
 
 const masterStockDeleteSchema = {
