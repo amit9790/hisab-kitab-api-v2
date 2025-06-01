@@ -16,6 +16,7 @@ module.exports = function (fastify, opts, next) {
       date: {
         type: Date,
         required: true,
+        // index: -1  // Non-unique index/ - for faster query performance
       },
       category: {
         type: String,
