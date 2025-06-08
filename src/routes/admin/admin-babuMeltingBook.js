@@ -146,7 +146,8 @@ const babuBookListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" }
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -155,15 +156,228 @@ const babuBookListSchema = {
 fastify.get('/babuMeltingAcctBook-list', babuBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const BabuBook = mongoose.model('babumelting-book')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    const babuBooks = await BabuBook.find({}, {}, options);
-    return babuBooks;
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+    
+    const defaultTotals = [
+        {
+            "meltingWeight": [
+                {
+                    "_id": null,
+                    "meltingWeight": 0
+                }
+            ],
+            "meltingIssueActual": [
+                {
+                    "_id": null,
+                    "meltingIssueActual": 0
+                }
+            ],
+            "meltingReceive": [
+                {
+                    "_id": null,
+                    "meltingReceive": 0
+                }
+            ],
+            "meltingLoss": [
+                {
+                    "_id": null,
+                    "meltingLoss": 0
+                }
+            ]
+        }
+    ];
 
+    if (state==="all"){
+        // Fetch paginated records
+        const BabuBookData = await BabuBook.find({})
+            .sort({ meltingDate: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await BabuBook.countDocuments({});
+
+        const totalQty = await BabuBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+                $facet: {
+                    meltingWeight: [
+                        { $unwind: "$meltingWeight" },
+                        { $unwind: "$meltingWeight" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingWeight: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingWeight",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssueActual: [
+                        { $unwind: "$meltingIssueActual" },
+                        { $unwind: "$meltingIssueActual" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssueActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssueActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingReceive: [
+                        { $unwind: "$meltingReceive" }, 
+                        { $unwind: "$meltingReceive" }, 
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingReceive",
+                                            to: "double", 
+                                            onError: 0, 
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                }
+            }
+        ]);
+    
+        return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": BabuBookData};
+        }
+
+    const boolean = (state === "deleted");
+
+    // Fetch paginated records
+    const BabuBookData = await BabuBook.find({is_deleted_flag: boolean})
+        .sort({ meltingDate: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await BabuBook.countDocuments({is_deleted_flag: boolean});
+    
+    const totalQty = await BabuBook.aggregate([
+        { $match: { is_deleted_flag: false } }, 
+        {
+            $facet: {
+                    meltingWeight: [
+                        { $unwind: "$meltingWeight" },
+                        { $unwind: "$meltingWeight" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingWeight: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingWeight",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssueActual: [
+                        { $unwind: "$meltingIssueActual" },
+                        { $unwind: "$meltingIssueActual" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssueActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssueActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingReceive: [
+                        { $unwind: "$meltingReceive" }, 
+                        { $unwind: "$meltingReceive" }, 
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingReceive",
+                                            to: "double", 
+                                            onError: 0, 
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                }
+        }
+    ]);
+
+    return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": BabuBookData};
 });
-
 
 const babuBookMeltingDeleteSchema = {
     schema: {
