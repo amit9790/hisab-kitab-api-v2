@@ -79,7 +79,8 @@ const polishListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" }
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -88,12 +89,66 @@ const polishListSchema = {
 fastify.get('/polish-list', polishListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const Polish = mongoose.model('polish')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
+
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+
+
+    if (state==="all"){
+        // Fetch paginated records
+        const PolishData = await Polish.find({})
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalCount = await Polish.countDocuments({});
+
+        const totalQty = await Polish.aggregate([
+            { $match: { is_deleted_flag: false } },
+            {
+              $group: {
+                _id: null,
+                issueWeight: { $sum: "$issueWeight" },
+                recvWeight: { $sum: "$recvWeight" },
+                lossWeight: { $sum: "$lossWeight" },
+                chill: { $sum: "$chill" },
+                fine: { $sum: "$fine" },
+                chatka: { $sum: "$chatka" }
+              }
+            }
+          ]);
+
+        return {"data": PolishData, "count": totalCount, "totalQty": totalQty};
     }
-    const polish = await Polish.find({}, {}, options);
-    return polish;
+
+    const boolean = (state === "deleted");
+
+    // Fetch paginated records
+    const PolishData = await Polish.find({is_deleted_flag: boolean})
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await Polish.countDocuments({is_deleted_flag: boolean});
+
+    const totalQty = await Polish.aggregate([
+        { $match: { is_deleted_flag: false } },
+        {
+          $group: {
+            _id: null,
+            issueWeight: { $sum: "$issueWeight" },
+            recvWeight: { $sum: "$recvWeight" },
+            lossWeight: { $sum: "$lossWeight" },
+            chill: { $sum: "$chill" },
+            fine: { $sum: "$fine" },
+            chatka: { $sum: "$chatka" }
+          }
+        }
+      ]);
+
+    return {"data": PolishData, "count": totalCount, "totalQty": totalQty};
 
 });
 
