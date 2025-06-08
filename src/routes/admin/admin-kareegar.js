@@ -194,14 +194,96 @@ const kareegarListSchema = {
 fastify.get('/kareegar-list', kareegarListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const Kareegar = mongoose.model('kareegar');
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    //const kareegars = await Kareegar.find({}, {}, options);
-    const kareegars = await Kareegar.find({});
-    //const kareegars = await Kareegar.find({}, {}, options);
-    return kareegars;
+    const KareegarBook = mongoose.model('kareegar-book');
+
+    const boolean = false;
+
+    // Fetch paginated records
+    const KareegarTest = await Kareegar.find({is_deleted_flag: boolean});
+
+    const totalCount = await Kareegar.countDocuments({is_deleted_flag: boolean});
+        
+    const totalQty = await KareegarBook.aggregate([
+        { $match: { is_deleted_flag: boolean, is_editable_flag: true} },
+        {
+          $group: {
+            _id: "$kareegar_id",
+            issue_wt: { 
+                $sum: {
+                    $convert: {
+                        input: "$issue_wt",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+             },
+            recv_wt: { 
+                $sum: {
+                    $convert: {
+                        input: "$recv_wt",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+             },
+            loss_wt: { 
+                $sum: {
+                    $convert: {
+                        input: "$loss_wt",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+             },
+            beads_issue_wt: { 
+                $sum: {
+                    $convert: {
+                        input: "$beads_issue_wt",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+             },
+            beads_recv_wt: { 
+                $sum: {
+                    $convert: {
+                        input: "$beads_recv_wt",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+             },
+          }
+        },
+          {
+         $project: {
+            _id: 1,
+            issue_wt: 1,
+            recv_wt: 1,
+            loss_wt: 1,
+            beads_issue_wt: 1,
+            beads_recv_wt: 1,
+            balance: {
+            $subtract: [
+                { $subtract: ["$issue_wt", "$recv_wt"] },
+                "$loss_wt"
+            ]
+            },
+            beads_balance:{
+                $subtract: [
+                "$beads_issue_wt", "$beads_recv_wt"
+            ]
+            },
+            }
+        }
+      ]);   
+
+    return {"count": totalCount, "data": KareegarTest, "totalQty": totalQty};
 
 });
 
