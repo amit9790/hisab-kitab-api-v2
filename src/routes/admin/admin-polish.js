@@ -94,7 +94,16 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
     const limit = parseInt(request.query.itemsPerPage) || 25;
     const state = request.query.state || "all";
     const skip = (page - 1) * limit;
-
+    
+    const defaultTotals = [{
+        _id: null,
+        issueWeight: 0,
+        recvWeight: 0,
+        lossWeight: 0,
+        chill: 0,
+        fine: 0,
+        chatka: 0
+    }];
 
     if (state==="all"){
         // Fetch paginated records
@@ -120,7 +129,7 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
             }
           ]);
 
-        return {"data": PolishData, "count": totalCount, "totalQty": totalQty};
+        return {"data": PolishData, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
     }
 
     const boolean = (state === "deleted");
@@ -148,7 +157,7 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
         }
       ]);
 
-    return {"data": PolishData, "count": totalCount, "totalQty": totalQty};
+    return {"data": PolishData, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
 
 });
 

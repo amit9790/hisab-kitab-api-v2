@@ -159,6 +159,65 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
     const state = request.query.state || "all";
     const skip = (page - 1) * limit;
     
+    const defaultTotals = [
+        {
+            "weight24k": [
+                {
+                    "_id": null,
+                    "weight24k": 0
+                }
+            ],
+            "issue22k": [
+                {
+                    "_id": null,
+                    "issue22k": 0
+                }
+            ],
+            "issue22kActual": [
+                {
+                    "_id": null,
+                    "issue22kActual": 0
+                }
+            ],
+            "receive22k": [
+                {
+                    "_id": null,
+                    "receive22k": 0
+                }
+            ],
+            "loss22k": [
+                {
+                    "_id": null,
+                    "loss22k": 0
+                }
+            ],
+            "tarpattaIssue": [
+                {
+                    "_id": null,
+                    "tarpattaIssue": 0
+                }
+            ],
+            "tarpattaReceive": [
+                {
+                    "_id": null,
+                    "tarpattaReceive": 0
+                }
+            ],
+            "tarpattaBhuka": [
+                {
+                    "_id": null,
+                    "tarpattaBhuka": 0
+                }
+            ],
+            "tarpattaLoss": [
+                {
+                    "_id": null,
+                    "tarpattaLoss": 0
+                }
+            ]
+        }
+    ];
+
     if (state==="all"){
         // Fetch paginated records
         const MeltingBookTest = await MeltingBook.find({})
@@ -343,7 +402,7 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
             }
         ]);
     
-        return {"count": totalCount, "totalQty": totalQty, "data": MeltingBookTest};
+        return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": MeltingBookTest};
         }
 
     const boolean = (state === "deleted");
@@ -531,7 +590,7 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
         }
     ]);
 
-    return {"count": totalCount, "totalQty": totalQty, "data": MeltingBookTest};
+    return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": MeltingBookTest};
 });
 
 

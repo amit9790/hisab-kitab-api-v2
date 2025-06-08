@@ -99,6 +99,13 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
     const state = request.query.state || "all";
     const skip = (page - 1) * limit;
     
+    const defaultTotals = [{
+        _id: null,
+        weight: 0,
+        receive22k: 0,
+        issue22k: 0,
+    }];
+    
     if (state==="all"){
         // Fetch paginated records
         const masterStocksTest = await MasterStock.find({})
@@ -120,7 +127,7 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
             }
           ]);
     
-        return {"data": masterStocksTest, "count": totalCount, "totalQty": totalQty};
+        return {"data": masterStocksTest, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
     }
 
     const boolean = (state === "deleted");
@@ -145,7 +152,7 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
         }
       ]);
 
-    return {"data": masterStocksTest, "count": totalCount, "totalQty": totalQty};
+    return {"data": masterStocksTest, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
 });
 
 const masterStockDeleteSchema = {
