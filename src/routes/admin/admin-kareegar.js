@@ -195,6 +195,15 @@ fastify.get('/kareegar-list', kareegarListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const Kareegar = mongoose.model('kareegar');
     const KareegarBook = mongoose.model('kareegar-book');
+        
+    const defaultTotals = [{
+        _id: null,
+        issue_wt: 0,
+        recv_wt: 0,
+        loss_wt: 0,
+        beads_issue_wt: 0,
+        beads_recv_wt: 0,
+    }];
 
     const boolean = false;
 
@@ -283,7 +292,7 @@ fastify.get('/kareegar-list', kareegarListSchema, async (request, reply) => {
         }
       ]);   
 
-    return {"count": totalCount, "data": KareegarTest, "totalQty": totalQty};
+    return {"count": totalCount, "data": KareegarTest, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
 
 });
 
