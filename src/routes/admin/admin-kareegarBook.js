@@ -36,8 +36,8 @@ const addKareegarBookSchema = {
 }
 fastify.post('/kareegarBook', addKareegarBookSchema, async (request, _reply) => {
     // create the user
-    const KareegarBook = mongoose.model('kareegar-book')
-    const User = mongoose.model('User')
+    const KareegarBook = mongoose.model('kareegar-book');
+    const User = mongoose.model('User');
 
     const kareegarBookId = uuidv4();
     try {

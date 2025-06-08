@@ -144,7 +144,8 @@ const meltingBookListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" }
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -153,13 +154,384 @@ const meltingBookListSchema = {
 fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const MeltingBook = mongoose.model('melting-book')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    const meltingBooks = await MeltingBook.find({}, {}, options);
-    return meltingBooks;
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+    
+    if (state==="all"){
+        // Fetch paginated records
+        const MeltingBookTest = await MeltingBook.find({})
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await MeltingBook.countDocuments({});
 
+        const totalQty = await MeltingBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+                $facet: {
+                    weight24k: [
+                        { $unwind: "$weight24k" },
+                        { $unwind: "$weight24k" },
+                        {
+                            $group: {
+                                _id: null, 
+                                weight24k: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$weight24k",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    issue22k: [
+                        { $unwind: "$issue22k" },
+                        { $unwind: "$issue22k" },
+                        {
+                            $group: {
+                                _id: null, 
+                                issue22k: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$issue22k",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    issue22kActual: [
+                        { $unwind: "$issue22kActual" },
+                        { $unwind: "$issue22kActual" },
+                        {
+                            $group: {
+                                _id: null, 
+                                issue22kActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$issue22kActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    receive22k: [
+                        { $unwind: "$receive22k" }, 
+                        { $unwind: "$receive22k" }, 
+                        {
+                            $group: {
+                                _id: null, 
+                                receive22k: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$receive22k",
+                                            to: "double", 
+                                            onError: 0, 
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    loss22k: [
+                        {
+                            $group: {
+                                _id: null, 
+                                loss22k: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$loss22k",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaIssue: [
+                        { $unwind: "$tarpattaIssue" },
+                        { $unwind: "$tarpattaIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaReceive: [
+                        { $unwind: "$tarpattaReceive" },
+                        { $unwind: "$tarpattaReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaBhuka: [
+                        { $unwind: "$tarpattaBhuka" },
+                        { $unwind: "$tarpattaBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]);
+    
+        return {"count": totalCount, "totalQty": totalQty, "data": MeltingBookTest};
+        }
+
+    const boolean = (state === "deleted");
+
+    // Fetch paginated records
+    const MeltingBookTest = await MeltingBook.find({is_deleted_flag: boolean})
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await MeltingBook.countDocuments({is_deleted_flag: boolean});
+    
+    const totalQty = await MeltingBook.aggregate([
+        { $match: { is_deleted_flag: false } }, 
+        {
+            $facet: {
+                weight24k: [
+                    { $unwind: "$weight24k" },
+                    { $unwind: "$weight24k" },
+                    {
+                        $group: {
+                            _id: null, 
+                            weight24k: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$weight24k",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                issue22k: [
+                    { $unwind: "$issue22k" },
+                    { $unwind: "$issue22k" },
+                    {
+                        $group: {
+                            _id: null, 
+                            issue22k: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$issue22k",
+                                        to: "double", 
+                                        onError: 0,  
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                issue22kActual: [
+                    { $unwind: "$issue22kActual" },
+                    { $unwind: "$issue22kActual" },
+                    {
+                        $group: {
+                            _id: null, 
+                            issue22kActual: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$issue22kActual",
+                                        to: "double", 
+                                        onError: 0,  
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                receive22k: [
+                    { $unwind: "$receive22k" }, 
+                    { $unwind: "$receive22k" }, 
+                    {
+                        $group: {
+                            _id: null, 
+                            receive22k: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$receive22k",
+                                        to: "double", 
+                                        onError: 0, 
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                loss22k: [
+                    {
+                        $group: {
+                            _id: null, 
+                            loss22k: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$loss22k",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaIssue: [
+                    { $unwind: "$tarpattaIssue" },
+                    { $unwind: "$tarpattaIssue" },
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaIssue: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaIssue",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaReceive: [
+                    { $unwind: "$tarpattaReceive" },
+                    { $unwind: "$tarpattaReceive" },
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaReceive",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaBhuka: [
+                    { $unwind: "$tarpattaBhuka" },
+                    { $unwind: "$tarpattaBhuka" },
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaBhuka: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaBhuka",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaLoss: [
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaLoss: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaLoss",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+
+    return {"count": totalCount, "totalQty": totalQty, "data": MeltingBookTest};
 });
 
 

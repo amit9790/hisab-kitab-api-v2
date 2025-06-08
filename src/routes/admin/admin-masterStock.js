@@ -93,12 +93,6 @@ const masterStockListSchema = {
 fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const MasterStock = mongoose.model('master-stock')
-    // For all data
-    // const options = {
-    //     page: parseInt(request.query.page) || 1,
-    //     limit: parseInt(request.query.itemsPerPage) || 25
-    // }
-    // const masterStocks = await MasterStock.find({}, {}, options);
 
     const page = parseInt(request.query.page) || 1;
     const limit = parseInt(request.query.itemsPerPage) || 25;

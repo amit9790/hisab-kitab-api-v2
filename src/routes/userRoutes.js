@@ -116,7 +116,6 @@ module.exports = function (fastify, opts, next) {
       if (await bcrypt.compare(req.body.password, user.password) === false) {
         return reply.code(409).send({ errorCode: 409, errorMessage: 'Login failed' })
       }
-      console.log("testing1")
 
       const { _id, username, email, roles } = user
 
