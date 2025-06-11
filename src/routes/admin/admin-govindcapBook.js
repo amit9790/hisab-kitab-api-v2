@@ -198,7 +198,9 @@ fastify.get('/govindCapAcctBook-list', govindBookListSchema, async (request, rep
             }
           ]);
     
-        return {"data": GovindCapData, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"data": GovindCapData, "count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty};
     }
 
     const boolean = (state === "deleted");
@@ -250,7 +252,9 @@ fastify.get('/govindCapAcctBook-list', govindBookListSchema, async (request, rep
         }
       ]);
 
-    return {"data": GovindCapData, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
+    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+      
+    return {"data": GovindCapData, "count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty};
 });
 
 

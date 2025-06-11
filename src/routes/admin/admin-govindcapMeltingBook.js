@@ -300,7 +300,9 @@ fastify.get('/govindCapMeltingAcctBook-list', govindBookListSchema, async (reque
             }
         ]);
     
-        return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": GovindMeltingBookData};
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": GovindMeltingBookData};
         }
 
     const boolean = (state === "deleted");
@@ -407,8 +409,10 @@ fastify.get('/govindCapMeltingAcctBook-list', govindBookListSchema, async (reque
             }
         }
     ]);
+    
+    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
 
-    return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": GovindMeltingBookData};    
+    return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": GovindMeltingBookData};    
 });
 
 
