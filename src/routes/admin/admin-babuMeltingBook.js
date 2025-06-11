@@ -281,7 +281,9 @@ fastify.get('/babuMeltingAcctBook-list', babuBookListSchema, async (request, rep
             }
         ]);
     
-        return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": BabuBookData};
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": BabuBookData};
         }
 
     const boolean = (state === "deleted");
@@ -376,7 +378,9 @@ fastify.get('/babuMeltingAcctBook-list', babuBookListSchema, async (request, rep
         }
     ]);
 
-    return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": BabuBookData};
+    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+    return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": BabuBookData};
 });
 
 const babuBookMeltingDeleteSchema = {
