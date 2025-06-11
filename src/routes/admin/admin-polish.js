@@ -108,7 +108,7 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
     if (state==="all"){
         // Fetch paginated records
         const PolishData = await Polish.find({})
-            .sort({ date: -1 })
+            .sort({ date: -1, createdAt: -1 })
             .skip(skip)
             .limit(limit);
 
@@ -136,7 +136,7 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
 
     // Fetch paginated records
     const PolishData = await Polish.find({is_deleted_flag: boolean})
-        .sort({ date: -1 })
+        .sort({ date: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
