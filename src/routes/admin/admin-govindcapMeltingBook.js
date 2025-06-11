@@ -146,7 +146,8 @@ const govindBookListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" }
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -155,13 +156,259 @@ const govindBookListSchema = {
 fastify.get('/govindCapMeltingAcctBook-list', govindBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const GovindBook = mongoose.model('govindcapmelting-book')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    const govindBooks = await GovindBook.find({}, {}, options);
-    return govindBooks;
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
 
+    const defaultTotals = [
+        {
+            "meltingWeight": [
+                {
+                    "_id": null,
+                    "meltingWeight": 0
+                }
+            ],
+            "meltingIssue": [
+                {
+                    "_id": null,
+                    "meltingIssue": 0
+                }
+            ],
+            "meltingIssueActual": [
+                {
+                    "_id": null,
+                    "meltingIssueActual": 0
+                }
+            ],
+            "meltingReceive": [
+                {
+                    "_id": null,
+                    "meltingReceive": 0
+                }
+            ],
+            "meltingLoss": [
+                {
+                    "_id": null,
+                    "meltingLoss": 0
+                }
+            ]
+        }
+    ];
+
+    if (state==="all"){
+        // Fetch paginated records
+        const GovindMeltingBookData = await GovindBook.find({})
+            .sort({ date: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await GovindBook.countDocuments({});
+
+        const totalQty = await GovindBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+                $facet: {
+                    meltingWeight: [
+                        { $unwind: "$meltingWeight" },
+                        { $unwind: "$meltingWeight" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingWeight: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingWeight",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssue: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssue",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssueActual: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssueActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssueActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingReceive: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingReceive",
+                                            to: "double", 
+                                            onError: 0, 
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]);
+    
+        return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": GovindMeltingBookData};
+        }
+
+    const boolean = (state === "deleted");
+
+    // Fetch paginated records
+    const GovindMeltingBookData = await GovindBook.find({is_deleted_flag: boolean})
+        .sort({ date: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await GovindBook.countDocuments({is_deleted_flag: boolean});
+    
+    const totalQty = await GovindBook.aggregate([
+        { $match: { is_deleted_flag: false } }, 
+        {
+            $facet: {
+                meltingWeight: [
+                    { $unwind: "$meltingWeight" },
+                    { $unwind: "$meltingWeight" },
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingWeight: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingWeight",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingIssue: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingIssue: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingIssue",
+                                        to: "double", 
+                                        onError: 0,  
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingIssueActual: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingIssueActual: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingIssueActual",
+                                        to: "double", 
+                                        onError: 0,  
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingReceive: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingReceive",
+                                        to: "double", 
+                                        onError: 0, 
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingLoss: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingLoss: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingLoss",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+
+    return {"count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty, "data": GovindMeltingBookData};    
 });
 
 

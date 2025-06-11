@@ -128,7 +128,8 @@ const govindBookListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" }
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -137,13 +138,119 @@ const govindBookListSchema = {
 fastify.get('/govindCapAcctBook-list', govindBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const GovindBook = mongoose.model('govindcap-book')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    const govindBooks = await GovindBook.find({}, {}, options);
-    return govindBooks;
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
 
+    const defaultTotals = [{
+        _id: null,
+        capAcctIssue: 0,
+        capAcctReceive: 0,
+        capAcctLoss: 0,
+    }];
+
+    if (state==="all"){
+        // Fetch paginated records
+        const GovindCapData = await GovindBook.find({})
+            .sort({ date: -1, createdAt: 1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await GovindBook.countDocuments({});
+
+        const totalQty = await GovindBook.aggregate([
+            { $match: { is_deleted_flag: false } },
+            {
+              $group: {
+                _id: null,
+                capAcctIssue: { 
+                    $sum: {
+                        $convert: {
+                            input: "$capAcctIssue",
+                            to: "double", 
+                            onError: 0,
+                            onNull: 0
+                        }
+                    }
+                },
+                capAcctReceive: { 
+                    $sum: {
+                        $convert: {
+                            input: "$capAcctReceive",
+                            to: "double", 
+                            onError: 0,
+                            onNull: 0
+                        }
+                    }
+                },
+                capAcctLoss: { 
+                    $sum: {
+                        $convert: {
+                            input: "$capAcctLoss",
+                            to: "double", 
+                            onError: 0,
+                            onNull: 0
+                        }
+                    }
+                },
+              }
+            }
+          ]);
+    
+        return {"data": GovindCapData, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
+    }
+
+    const boolean = (state === "deleted");
+
+    // Fetch paginated records
+    const GovindCapData = await GovindBook.find({is_deleted_flag: boolean})
+        .sort({ date: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await GovindBook.countDocuments({is_deleted_flag: boolean});
+    
+    const totalQty = await GovindBook.aggregate([
+        { $match: { is_deleted_flag: false } },
+        {
+          $group: {
+            _id: null,
+            capAcctIssue: { 
+                $sum: {
+                    $convert: {
+                        input: "$capAcctIssue",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+            },
+            capAcctReceive: { 
+                $sum: {
+                    $convert: {
+                        input: "$capAcctReceive",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+            },
+            capAcctLoss: { 
+                $sum: {
+                    $convert: {
+                        input: "$capAcctLoss",
+                        to: "double", 
+                        onError: 0,
+                        onNull: 0
+                    }
+                }
+            },
+          }
+        }
+      ]);
+
+    return {"data": GovindCapData, "count": totalCount, "totalQty": totalQty.length === 0 ? defaultTotals: totalQty};
 });
 
 
