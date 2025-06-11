@@ -109,7 +109,7 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
     if (state==="all"){
         // Fetch paginated records
         const masterStocksTest = await MasterStock.find({})
-            .sort({ date: -1 })
+            .sort({ date: -1, createdAt: 1 })
             .skip(skip)
             .limit(limit);
         
@@ -134,7 +134,7 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
 
     // Fetch paginated records
     const masterStocksTest = await MasterStock.find({is_deleted_flag: boolean})
-        .sort({ date: -1 })
+        .sort({ date: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit);
 

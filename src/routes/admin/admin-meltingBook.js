@@ -221,7 +221,7 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
     if (state==="all"){
         // Fetch paginated records
         const MeltingBookTest = await MeltingBook.find({})
-            .sort({ date: -1 })
+            .sort({ date: -1, createdAt: -1 })
             .skip(skip)
             .limit(limit);
         
@@ -409,7 +409,7 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
 
     // Fetch paginated records
     const MeltingBookTest = await MeltingBook.find({is_deleted_flag: boolean})
-        .sort({ date: -1 })
+        .sort({ date: -1, createdAt: -1 })
         .skip(skip)
         .limit(limit);
 
