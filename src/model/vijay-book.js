@@ -65,34 +65,18 @@ module.exports = function (fastify, opts, next) {
         type: [String],
         required: true,
       },
-      // tarpattaIssueTotal: {
-      //   type: String,
-      //   required: true,
-      // },
       tarpattaReceive: {
         type: [String],
         required: true,
       },
-      // tarpattaReceiveTotal: {
-      //   type: String,
-      //   required: true,
-      // },
       tarpattaBhuka: {
         type: [String],
         required: true,
       },
-      // tarpattaBhukaTotal: {
-      //   type: String,
-      //   required: true,
-      // },
       tarpattaLoss: {
         type: String,
         required: true,
       },
-      // tarpattaLossTotal: {
-      //   type: String,
-      //   required: true,
-      // },
       createdBy: {
         type: String,
         required: false,
