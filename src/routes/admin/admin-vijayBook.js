@@ -318,7 +318,11 @@ const vijayBookListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" },
+            issue_to_kareegar: { type: 'string', default: 'undefined'},
+            checkSolderChain: { type: 'string', default: 'undefined' },
+            checkJointChain: { type: 'string', default: 'undefined' },
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -327,13 +331,1194 @@ const vijayBookListSchema = {
 fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const VijayBook = mongoose.model('vijay-book')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
-    }
-    const vijayBooks = await VijayBook.find({}, {}, options);
-    return vijayBooks;
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+    const issue_to_kareegar = request.query.issue_to_kareegar || 'undefined';
+    const checkSolderChain = request.query.checkSolderChain || 'undefined';
+    const checkJointChain = request.query.checkJointChain || 'undefined';
+    const query = {};
 
+    if (issue_to_kareegar !== 'undefined' && issue_to_kareegar !== "all") {
+        query.issue_to_kareegar = issue_to_kareegar;
+    };
+
+    const defaultTotals = [
+        {
+            "meltingWeight": [
+                {
+                    "_id": null,
+                    "meltingWeight": 0
+                }
+            ],
+            "meltingIssue": [
+                {
+                    "_id": null,
+                    "meltingIssue": 0
+                }
+            ],
+            "meltingIssueActual": [
+                {
+                    "_id": null,
+                    "meltingIssueActual": 0
+                }
+            ],
+            "meltingReceive": [
+                {
+                    "_id": null,
+                    "meltingReceive": 0
+                }
+            ],
+            "meltingLoss": [
+                {
+                    "_id": null,
+                    "meltingLoss": 0
+                }
+            ],
+            "tarpattaIssue": [
+                {
+                    "_id": null,
+                    "tarpattaIssue": 0
+                }
+            ],
+            "tarpattaReceive": [
+                {
+                    "_id": null,
+                    "tarpattaReceive": 0
+                }
+            ],
+            "tarpattaBhuka": [
+                {
+                    "_id": null,
+                    "tarpattaBhuka": 0
+                }
+            ],
+            "tarpattaLoss": [
+                {
+                    "_id": null,
+                    "tarpattaLoss": 0
+                }
+            ],
+            "vijayTarpattaReceive": [
+                {
+                    "_id": null,
+                    "vijayTarpattaReceive": 0
+                }
+            ],
+            "vijayIssue": [
+                {
+                    "_id": null,
+                    "vijayIssue": 0
+                }
+            ],
+            "vijayReceive": [
+                {
+                    "_id": null,
+                    "vijayReceive": 0
+                }
+            ],
+            "vijayBhuka": [
+                {
+                    "_id": null,
+                    "vijayBhuka": 0
+                }
+            ],
+            "vijayLoss": [
+                {
+                    "_id": null,
+                    "vijayLoss": 0
+                }
+            ],
+            "manishTarpattaReceive": [
+                {
+                    "_id": null,
+                    "manishTarpattaReceive": 0
+                }
+            ],
+            "manishIssue": [
+                {
+                    "_id": null,
+                    "manishIssue": 0
+                }
+            ],
+            "manishReceive": [
+                {
+                    "_id": null,
+                    "manishReceive": 0
+                }
+            ],
+            "manishBhuka": [
+                {
+                    "_id": null,
+                    "manishBhuka": 0
+                }
+            ],
+            "manishLoss": [
+                {
+                    "_id": null,
+                    "manishLoss": 0
+                }
+            ]
+        }
+    ];
+
+    if (state==="all"){
+        // Fetch paginated records
+        const VijayBookData = await VijayBook.find(query)
+            .sort({ date: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await VijayBook.countDocuments(query);
+
+        const totalQty = await VijayBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+                $facet: {
+                    meltingWeight: [
+                        { $unwind: "$meltingWeight" },
+                        { $unwind: "$meltingWeight" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingWeight: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingWeight",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssue: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssue",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssueActual: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssueActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssueActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingReceive: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingReceive",
+                                            to: "double", 
+                                            onError: 0, 
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingBhuka: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingBhuka",
+                                            to: "double", 
+                                            onError: 0, 
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaIssue: [
+                        { $unwind: "$tarpattaIssue" },
+                        { $unwind: "$tarpattaIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaReceive: [
+                        { $unwind: "$tarpattaReceive" },
+                        { $unwind: "$tarpattaReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaBhuka: [
+                        { $unwind: "$tarpattaBhuka" },
+                        { $unwind: "$tarpattaBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    vijayTarpattaReceive: [
+                        { $match: { issue_to_kareegar: "Vijay" } },
+                        { $unwind: "$tarpattaReceive" },
+                        { $unwind: "$tarpattaReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                vijayTarpattaReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    vijayIssue: [
+                        { $match: { issue_to_kareegar: "Vijay" } },
+                        { $unwind: "$vijayIssue" },
+                        { $unwind: "$vijayIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                vijayIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$vijayIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    vijayReceive: [
+                        { $match: { issue_to_kareegar: "Vijay" } },
+                        { $unwind: "$vijayReceive" },
+                        { $unwind: "$vijayReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                vijayReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$vijayReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    vijayBhuka: [
+                        { $match: { issue_to_kareegar: "Vijay" } },
+                        { $unwind: "$vijayBhuka" },
+                        { $unwind: "$vijayBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                vijayBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$vijayBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    vijayLoss: [
+                        { $match: { issue_to_kareegar: "Vijay" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                vijayLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$vijayLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    manishTarpattaReceive: [
+                        { $match: { issue_to_kareegar: "Manish" } },
+                        { $unwind: "$tarpattaReceive" },
+                        { $unwind: "$tarpattaReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                manishTarpattaReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    manishIssue: [
+                        { $match: { issue_to_kareegar: "Manish" } },
+                        { $unwind: "$manishIssue" },
+                        { $unwind: "$manishIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                manishIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$manishIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    manishReceive: [
+                        { $match: { issue_to_kareegar: "Manish" } },
+                        { $unwind: "$manishReceive" },
+                        { $unwind: "$manishReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                manishReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$manishReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    manishBhuka: [
+                        { $match: { issue_to_kareegar: "Manish" } },
+                        { $unwind: "$manishBhuka" },
+                        { $unwind: "$manishBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                manishBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$manishBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    manishLoss: [
+                        { $match: { issue_to_kareegar: "Manish" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                manishLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$manishLoss",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]);
+    
+        if (checkSolderChain !== 'undefined' && checkSolderChain !== "false") {
+            query.solderChainIssue = { $exists: true, $not: { $size: 0 } };
+            const VijayBookData = await VijayBook.aggregate([
+            {
+                $match: {
+                ...query,
+                solderChainIssue: { $exists: true, $ne: [] }
+                }
+            },
+            {
+                $addFields: {
+                solderChainIssue: {
+                    $map: {
+                    input: { $range: [0, { $size: "$solderChainIssue" }] },
+                    as: "idx",
+                    in: {
+                        value: { $arrayElemAt: ["$solderChainIssue", "$$idx"] },
+                        index: "$$idx"
+                    }
+                    }
+                }
+                }
+            },
+            { $unwind: "$solderChainIssue" },
+            {
+                $addFields: {
+                solderChainIssue: "$solderChainIssue.value",
+                index: "$solderChainIssue.index"
+                }
+            },
+            { $sort: { date: -1, createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit }
+            ]);
+
+            const totalCountResult = await VijayBook.aggregate([
+            {
+                $match: {
+                ...query,
+                solderChainIssue: { $exists: true, $ne: [] }
+                }
+            },
+            { $unwind: "$solderChainIssue" },
+            { $count: "total" }
+            ]);
+
+            const totalCount = totalCountResult[0]?.total || 0;
+            
+            const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+            return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
+
+        };
+
+        if (checkJointChain !== 'undefined' && checkJointChain !== "false") {
+            query.solderChainReceive = { $exists: true, $not: { $size: 0 } };
+
+            const VijayBookData = await VijayBook.aggregate([
+            {
+                $match: {
+                ...query,
+                solderChainReceive: { $exists: true, $ne: [] }
+                }
+            },
+            {
+                $addFields: {
+                solderChainReceive: {
+                        $filter: {
+                        input: "$solderChainReceive",
+                        as: "val",
+                        cond: { $ne: ["$$val", "-1"] }
+                        }
+                }
+                }
+            },
+            {
+                $addFields: {
+                solderChainReceive: {
+                    $map: {
+                    input: { $range: [0, { $size: "$solderChainReceive" }] },
+                    as: "idx",
+                    in: {
+                        value: { $arrayElemAt: ["$solderChainReceive", "$$idx"] },
+                        index: "$$idx"
+                    }
+                    }
+                }
+                }
+            },
+            { $unwind: "$solderChainReceive" },
+            {
+                $addFields: {
+                solderChainReceive: "$solderChainReceive.value",
+                index: "$solderChainReceive.index"
+                }
+            },
+            { $sort: { date: -1, createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit }
+            ]);
+
+            const totalCountResult = await VijayBook.aggregate([
+            {
+                $match: {
+                ...query,
+                solderChainReceive: { $exists: true, $ne: [] }
+                }
+            },
+            {
+                $addFields: {
+                solderChainReceive: {
+                        $filter: {
+                        input: "$solderChainReceive",
+                        as: "val",
+                        cond: { $ne: ["$$val", "-1"] }
+                        }
+                }
+                }
+            },
+            { $unwind: "$solderChainReceive" },
+            { $count: "total" }
+            ]);
+
+            const totalCount = totalCountResult[0]?.total || 0;
+            
+            const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+            return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
+
+        };
+
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
+        }
+
+    const boolean = (state === "deleted");
+
+    query.is_deleted_flag = boolean;
+
+    // Fetch paginated records
+    const VijayBookData = await VijayBook.find(query)
+        .sort({ date: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await VijayBook.countDocuments(query);
+    
+    const totalQty = await VijayBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+            $facet: {
+                meltingWeight: [
+                    { $unwind: "$meltingWeight" },
+                    { $unwind: "$meltingWeight" },
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingWeight: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingWeight",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingIssue: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingIssue: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingIssue",
+                                        to: "double", 
+                                        onError: 0,  
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingIssueActual: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingIssueActual: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingIssueActual",
+                                        to: "double", 
+                                        onError: 0,  
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingReceive: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingReceive",
+                                        to: "double", 
+                                        onError: 0, 
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingBhuka: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingBhuka: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingBhuka",
+                                        to: "double", 
+                                        onError: 0, 
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                meltingLoss: [
+                    {
+                        $group: {
+                            _id: null, 
+                            meltingLoss: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$meltingLoss",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaIssue: [
+                    { $unwind: "$tarpattaIssue" },
+                    { $unwind: "$tarpattaIssue" },
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaIssue: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaIssue",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaReceive: [
+                    { $unwind: "$tarpattaReceive" },
+                    { $unwind: "$tarpattaReceive" },
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaReceive",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaBhuka: [
+                    { $unwind: "$tarpattaBhuka" },
+                    { $unwind: "$tarpattaBhuka" },
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaBhuka: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaBhuka",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                tarpattaLoss: [
+                    {
+                        $group: {
+                            _id: null, 
+                            tarpattaLoss: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaLoss",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                vijayTarpattaReceive: [
+                    { $match: { issue_to_kareegar: "Vijay" } },
+                    { $unwind: "$tarpattaReceive" },
+                    { $unwind: "$tarpattaReceive" },
+                    {
+                        $group: {
+                            _id: null, 
+                            vijayTarpattaReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaReceive",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                vijayIssue: [
+                    { $match: { issue_to_kareegar: "Vijay" } },
+                    { $unwind: "$vijayIssue" },
+                    { $unwind: "$vijayIssue" },
+                    {
+                        $group: {
+                            _id: null, 
+                            vijayIssue: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$vijayIssue",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                vijayReceive: [
+                    { $match: { issue_to_kareegar: "Vijay" } },
+                    { $unwind: "$vijayReceive" },
+                    { $unwind: "$vijayReceive" },
+                    {
+                        $group: {
+                            _id: null, 
+                            vijayReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$vijayReceive",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                vijayBhuka: [
+                    { $match: { issue_to_kareegar: "Vijay" } },
+                    { $unwind: "$vijayBhuka" },
+                    { $unwind: "$vijayBhuka" },
+                    {
+                        $group: {
+                            _id: null, 
+                            vijayBhuka: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$vijayBhuka",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                vijayLoss: [
+                    { $match: { issue_to_kareegar: "Vijay" } },
+                    {
+                        $group: {
+                            _id: null, 
+                            vijayLoss: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$vijayLoss",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                manishTarpattaReceive: [
+                    { $match: { issue_to_kareegar: "Manish" } },
+                    { $unwind: "$tarpattaReceive" },
+                    { $unwind: "$tarpattaReceive" },
+                    {
+                        $group: {
+                            _id: null, 
+                            manishTarpattaReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$tarpattaReceive",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                manishIssue: [
+                    { $match: { issue_to_kareegar: "Manish" } },
+                    { $unwind: "$manishIssue" },
+                    { $unwind: "$manishIssue" },
+                    {
+                        $group: {
+                            _id: null, 
+                            manishIssue: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$manishIssue",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                manishReceive: [
+                    { $match: { issue_to_kareegar: "Manish" } },
+                    { $unwind: "$manishReceive" },
+                    { $unwind: "$manishReceive" },
+                    {
+                        $group: {
+                            _id: null, 
+                            manishReceive: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$manishReceive",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                manishBhuka: [
+                    { $match: { issue_to_kareegar: "Manish" } },
+                    { $unwind: "$manishBhuka" },
+                    { $unwind: "$manishBhuka" },
+                    {
+                        $group: {
+                            _id: null, 
+                            manishBhuka: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$manishBhuka",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                manishLoss: [
+                    { $match: { issue_to_kareegar: "Manish" } },
+                    {
+                        $group: {
+                            _id: null, 
+                            manishLoss: {
+                                $sum: {
+                                    $convert: {
+                                        input: "$manishLoss",
+                                        to: "double", 
+                                        onError: 0,
+                                        onNull: 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+
+    if (checkSolderChain !== 'undefined' && checkSolderChain !== "false") {
+        query.solderChainIssue = { $exists: true, $not: { $size: 0 } };
+        const VijayBookData = await VijayBook.aggregate([
+        {
+            $match: {
+            ...query,
+            solderChainIssue: { $exists: true, $ne: [] }
+            }
+        },
+        {
+            $addFields: {
+            solderChainIssue: {
+                $map: {
+                input: { $range: [0, { $size: "$solderChainIssue" }] },
+                as: "idx",
+                in: {
+                    value: { $arrayElemAt: ["$solderChainIssue", "$$idx"] },
+                    index: "$$idx"
+                }
+                }
+            }
+            }
+        },
+        { $unwind: "$solderChainIssue" },
+        {
+            $addFields: {
+            solderChainIssue: "$solderChainIssue.value",
+            index: "$solderChainIssue.index"
+            }
+        },
+        { $sort: { date: -1, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+        ]);
+
+        const totalCountResult = await VijayBook.aggregate([
+        {
+            $match: {
+            ...query,
+            solderChainIssue: { $exists: true, $ne: [] }
+            }
+        },
+        { $unwind: "$solderChainIssue" },
+        { $count: "total" }
+        ]);
+
+        const totalCount = totalCountResult[0]?.total || 0;
+        
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
+
+    };
+
+    if (checkJointChain !== 'undefined' && checkJointChain !== "false") {
+        query.solderChainReceive = { $exists: true, $not: { $size: 0 } };
+
+        const VijayBookData = await VijayBook.aggregate([
+        {
+            $match: {
+            ...query,
+            solderChainReceive: { $exists: true, $ne: [] },
+            }
+        },
+        {
+            $addFields: {
+            solderChainReceive: {
+                    $filter: {
+                    input: "$solderChainReceive",
+                    as: "val",
+                    cond: { $ne: ["$$val", "-1"] }
+                    }
+            }
+            }
+        },
+        {
+            $addFields: {
+            solderChainReceive: {
+                $map: {
+                input: { $range: [0, { $size: "$solderChainReceive" }] },
+                as: "idx",
+                in: {
+                    value: { $arrayElemAt: ["$solderChainReceive", "$$idx"] },
+                    index: "$$idx"
+                }
+                }
+            }
+            }
+        },
+        { $unwind: "$solderChainReceive" },
+        {
+            $addFields: {
+            solderChainReceive: "$solderChainReceive.value",
+            index: "$solderChainReceive.index"
+            }
+        },
+        { $sort: { date: -1, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit }
+        ]);
+
+        const totalCountResult = await VijayBook.aggregate([
+        {
+            $match: {
+            ...query,
+            solderChainReceive: { $exists: true, $ne: [] }
+            }
+        },
+        {
+            $addFields: {
+            solderChainReceive: {
+                    $filter: {
+                    input: "$solderChainReceive",
+                    as: "val",
+                    cond: { $ne: ["$$val", "-1"] }
+                    }
+            }
+            }
+        },
+        { $unwind: "$solderChainReceive" },
+        { $count: "total" }
+        ]);
+
+        const totalCount = totalCountResult[0]?.total || 0;
+        
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
+
+    };
+
+    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+    return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
+ 
 });
 
 
