@@ -245,7 +245,9 @@ const govindBookListSchema = {
         security: [{apiKey: []}],
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
-            page: { type: 'number', default: 1 }
+            page: { type: 'number', default: 1 },
+            state: { type: 'string', default: "all" },
+            is_assigned_to: { type: 'string', default: 'undefined'},
         }
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -254,12 +256,889 @@ const govindBookListSchema = {
 fastify.get('/govindBook-list', govindBookListSchema, async (request, reply) => {
     reply.type('application/json').code(200)
     const GovindBook = mongoose.model('govind-book')
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25
+
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+    const is_assigned_to = request.query.is_assigned_to || 'undefined';
+    const query = {};
+
+    if (is_assigned_to !== 'undefined' && is_assigned_to !== "all") {
+        query.is_assigned_to = is_assigned_to;
     }
-    const govindBooks = await GovindBook.find({}, {}, options);
-    return govindBooks;
+
+    const defaultTotals = [
+        {
+            "meltingWeight": [
+                {
+                    "_id": null,
+                    "meltingWeight": 0
+                }
+            ],
+            "meltingIssue": [
+                {
+                    "_id": null,
+                    "meltingIssue": 0
+                }
+            ],
+            "meltingIssueActual": [
+                {
+                    "_id": null,
+                    "meltingIssueActual": 0
+                }
+            ],
+            "meltingReceive": [
+                {
+                    "_id": null,
+                    "meltingReceive": 0
+                }
+            ],
+            "meltingLoss": [
+                {
+                    "_id": null,
+                    "meltingLoss": 0
+                }
+            ],
+            "tarpattaIssue": [
+                {
+                    "_id": null,
+                    "tarpattaIssue": 0
+                }
+            ],
+            "tarpattaReceive": [
+                {
+                    "_id": null,
+                    "tarpattaReceive": 0
+                }
+            ],
+            "tarpattaBhuka": [
+                {
+                    "_id": null,
+                    "tarpattaBhuka": 0
+                }
+            ],
+            "tarpattaLoss": [
+                {
+                    "_id": null,
+                    "tarpattaLoss": 0
+                }
+            ],
+            "machineIssue": [
+                {
+                    "_id": null,
+                    "machineIssue": 0
+                }
+            ],
+            "machineReceive": [
+                {
+                    "_id": null,
+                    "machineReceive": 0
+                }
+            ],
+            "machineLoss": [
+                {
+                    "_id": null,
+                    "machineLoss": 0
+                }
+            ],
+            "daiBhukaDai": [
+                {
+                    "_id": null,
+                    "daiBhukaDai": 0
+                }
+            ],
+            "daiBhukaBhuka": [
+                {
+                    "_id": null,
+                    "daiBhukaBhuka": 0
+                }
+            ],
+            "machine835Issue": [
+                {
+                    "_id": null,
+                    "machine835Issue": 0
+                }
+            ],
+            "machine835Receive": [
+                {
+                    "_id": null,
+                    "machine835Receive": 0
+                }
+            ],
+            "machine835Loss": [
+                {
+                    "_id": null,
+                    "machine835Loss": 0
+                }
+            ],
+            "daiBhuka835Dai": [
+                {
+                    "_id": null,
+                    "daiBhuka835Dai": 0
+                }
+            ],
+            "daiBhuka835Bhuka": [
+                {
+                    "_id": null,
+                    "daiBhuka835Bhuka": 0
+                }
+            ]
+        }
+    ];
+
+    if (state==="all"){
+        // Fetch paginated records
+        const GovindBookData = await GovindBook.find(query)
+            .sort({ date: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await GovindBook.countDocuments(query);
+
+        const totalQty = await GovindBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+                $facet: {
+                    meltingWeight: [
+                        { $unwind: "$meltingWeight" },
+                        { $unwind: "$meltingWeight" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingWeight: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingWeight",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssue: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssue",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssueActual: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssueActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssueActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingReceive: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingReceive",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingLoss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaIssue: [
+                        { $unwind: "$tarpattaIssue" },
+                        { $unwind: "$tarpattaIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaReceive: [
+                        { $unwind: "$tarpattaReceive" },
+                        { $unwind: "$tarpattaReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaBhuka: [
+                        { $unwind: "$tarpattaBhuka" },
+                        { $unwind: "$tarpattaBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaLoss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machineIssue: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        { $unwind: "$machineIssue" },
+                        { $unwind: "$machineIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                machineIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machineIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machineReceive: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machineReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machineReceive",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machineLoss: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machineLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machineLoss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhukaDai: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        { $unwind: "$daiBhukaDai" },
+                        { $unwind: "$daiBhukaDai" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhukaDai: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhukaDai",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhukaBhuka: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        { $unwind: "$daiBhukaBhuka" },
+                        { $unwind: "$daiBhukaBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhukaBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhukaBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machine835Issue: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        { $unwind: "$machine835Issue" },
+                        { $unwind: "$machine835Issue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                machine835Issue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machine835Issue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machine835Receive: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machine835Receive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machine835Receive",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machine835Loss: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machine835Loss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machine835Loss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhuka835Dai: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        { $unwind: "$daiBhuka835Dai" },
+                        { $unwind: "$daiBhuka835Dai" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhuka835Dai: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhuka835Dai",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhuka835Bhuka: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        { $unwind: "$daiBhuka835Bhuka" },
+                        { $unwind: "$daiBhuka835Bhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhuka835Bhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhuka835Bhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                }
+            }
+        ])
+
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": GovindBookData};
+
+        }
+
+    const boolean = (state === "deleted");
+
+    query.is_deleted_flag = boolean;
+
+// Fetch paginated records
+        const GovindBookData = await GovindBook.find(query)
+            .sort({ date: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+        
+        const totalCount = await GovindBook.countDocuments(query);
+
+        const totalQty = await GovindBook.aggregate([
+            { $match: { is_deleted_flag: false } }, 
+            {
+                $facet: {
+                    meltingWeight: [
+                        { $unwind: "$meltingWeight" },
+                        { $unwind: "$meltingWeight" },
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingWeight: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingWeight",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssue: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssue",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingIssueActual: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingIssueActual: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingIssueActual",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingReceive: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingReceive",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    meltingLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                meltingLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$meltingLoss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaIssue: [
+                        { $unwind: "$tarpattaIssue" },
+                        { $unwind: "$tarpattaIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaReceive: [
+                        { $unwind: "$tarpattaReceive" },
+                        { $unwind: "$tarpattaReceive" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaReceive",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaBhuka: [
+                        { $unwind: "$tarpattaBhuka" },
+                        { $unwind: "$tarpattaBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    tarpattaLoss: [
+                        {
+                            $group: {
+                                _id: null, 
+                                tarpattaLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$tarpattaLoss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machineIssue: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        { $unwind: "$machineIssue" },
+                        { $unwind: "$machineIssue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                machineIssue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machineIssue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machineReceive: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machineReceive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machineReceive",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machineLoss: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machineLoss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machineLoss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhukaDai: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        { $unwind: "$daiBhukaDai" },
+                        { $unwind: "$daiBhukaDai" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhukaDai: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhukaDai",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhukaBhuka: [
+                        { $match: { is_assigned_to: "Dai + Bhuka" } },
+                        { $unwind: "$daiBhukaBhuka" },
+                        { $unwind: "$daiBhukaBhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhukaBhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhukaBhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machine835Issue: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        { $unwind: "$machine835Issue" },
+                        { $unwind: "$machine835Issue" },
+                        {
+                            $group: {
+                                _id: null, 
+                                machine835Issue: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machine835Issue",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machine835Receive: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machine835Receive: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machine835Receive",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    machine835Loss: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        {
+                            $group: {
+                                _id: null, 
+                                machine835Loss: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$machine835Loss",
+                                            to: "double", 
+                                            onError: 0,  
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhuka835Dai: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        { $unwind: "$daiBhuka835Dai" },
+                        { $unwind: "$daiBhuka835Dai" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhuka835Dai: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhuka835Dai",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    daiBhuka835Bhuka: [
+                        { $match: { is_assigned_to: "83.50 + 75 A/C" } },
+                        { $unwind: "$daiBhuka835Bhuka" },
+                        { $unwind: "$daiBhuka835Bhuka" },
+                        {
+                            $group: {
+                                _id: null, 
+                                daiBhuka835Bhuka: {
+                                    $sum: {
+                                        $convert: {
+                                            input: "$daiBhuka835Bhuka",
+                                            to: "double", 
+                                            onError: 0,
+                                            onNull: 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                }
+            }
+        ])
+
+        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+
+        return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": GovindBookData};
 
 });
 
