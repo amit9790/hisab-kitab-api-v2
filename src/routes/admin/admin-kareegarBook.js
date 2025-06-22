@@ -143,6 +143,8 @@ const kareegarBookListSchema = {
         querystring: {
             itemsPerPage: { type: 'number', default: 25 },
             page: { type: 'number', default: 1 },
+            cutoffDateNumber: { type: 'number', default: 0 },
+            state: { type: 'string', default: "all" },
             kareegar_id: {type: 'string'}
         }
     },
@@ -152,20 +154,179 @@ fastify.get('/kareegarBook-list', kareegarBookListSchema, async (request, reply)
     reply.type('application/json').code(200);
     const KareegarBook = mongoose.model('kareegar-book');
 
-    const options = {
-        page: parseInt(request.query.page) || 1,
-        limit: parseInt(request.query.itemsPerPage) || 25,
-    };
-
-    const kareegarIdFilter = {
-        kareegar_id: request.query.kareegar_id
-    };
-
-    // To query limited data and get pagination
-    // const KareegarBooks = await KareegarBook.find(kareegarIdFilter, {}, options);
+    const page = parseInt(request.query.page) || 1;
+    const limit = parseInt(request.query.itemsPerPage) || 25;
+    const state = request.query.state || "all";
+    const skip = (page - 1) * limit;
+    const kareegarId = request.query.kareegar_id;
+    let cutoffDateNumber = parseInt(request.query.cutoffDateNumber) || 1;
+    const Kareegar = mongoose.model('kareegar');
+    let KareegarDetails = await Kareegar.find({_id: kareegarId});
+    if (KareegarDetails[0].kareegarCutoffStartDate.length === cutoffDateNumber){
+        cutoffDateNumber = 0;
+    }
+    const query = {};
+    query.kareegar_id = kareegarId;
+    query.cutoffDateNumber = cutoffDateNumber;
+    const totalQuery = {};
+    totalQuery.kareegar_id = kareegarId;
+    totalQuery.cutoffDateNumber = cutoffDateNumber;
+    totalQuery.is_deleted_flag = false;
+    const defaultTotals = [{
+        _id: null,
+        issue_wt: 0,
+        recv_wt: 0,
+        loss_wt: 0,
+        beads_issue_wt: 0,
+        beads_recv_wt: 0,
+    }];
     
-    const KareegarBooks = await KareegarBook.find(kareegarIdFilter, {});
-    return KareegarBooks;
+    if (state==="all"){
+        // Fetch paginated records
+        const KareegarBookData = await KareegarBook.find(query)
+            .sort({ date: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalCount = await KareegarBook.countDocuments(query);
+
+        const totalQty = await KareegarBook.aggregate([
+            { $match: totalQuery },
+            {
+              $group: {
+                _id: null,
+                issue_wt: {
+                    $sum: {
+                        $convert: {
+                            input: "$issue_wt",
+                            to: "double", 
+                            onError: 0,  
+                            onNull: 0
+                        }
+                    }
+                },
+                recv_wt: {
+                    $sum: {
+                        $convert: {
+                            input: "$recv_wt",
+                            to: "double", 
+                            onError: 0,  
+                            onNull: 0
+                        }
+                    }
+                },
+                loss_wt: {
+                    $sum: {
+                        $convert: {
+                            input: "$loss_wt",
+                            to: "double", 
+                            onError: 0,  
+                            onNull: 0
+                        }
+                    }
+                },
+                beads_issue_wt: {
+                    $sum: {
+                        $convert: {
+                            input: "$beads_issue_wt",
+                            to: "double", 
+                            onError: 0,  
+                            onNull: 0
+                        }
+                    }
+                },
+                beads_recv_wt: {
+                    $sum: {
+                        $convert: {
+                            input: "$beads_recv_wt",
+                            to: "double", 
+                            onError: 0,  
+                            onNull: 0
+                        }
+                    }
+                },
+              }
+            }
+          ]);
+
+        const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
+
+        return {"data": KareegarBookData, "count": totalCount, "totalQty":  isEmpty ? defaultTotals: totalQty};
+    }
+
+    const boolean = (state === "deleted");
+    query.is_deleted_flag = boolean;
+
+    // Fetch paginated records
+    const KareegarBookData = await KareegarBook.find(query)
+        .sort({ date: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+    const totalCount = await KareegarBook.countDocuments(query);
+
+    const totalQty = await KareegarBook.aggregate([
+        { $match: totalQuery },
+        {
+            $group: {
+            _id: null,
+            issue_wt: {
+                $sum: {
+                    $convert: {
+                        input: "$issue_wt",
+                        to: "double", 
+                        onError: 0,  
+                        onNull: 0
+                    }
+                }
+            },
+            recv_wt: {
+                $sum: {
+                    $convert: {
+                        input: "$recv_wt",
+                        to: "double", 
+                        onError: 0,  
+                        onNull: 0
+                    }
+                }
+            },
+            loss_wt: {
+                $sum: {
+                    $convert: {
+                        input: "$loss_wt",
+                        to: "double", 
+                        onError: 0,  
+                        onNull: 0
+                    }
+                }
+            },
+            beads_issue_wt: {
+                $sum: {
+                    $convert: {
+                        input: "$beads_issue_wt",
+                        to: "double", 
+                        onError: 0,  
+                        onNull: 0
+                    }
+                }
+            },
+            beads_recv_wt: {
+                $sum: {
+                    $convert: {
+                        input: "$beads_recv_wt",
+                        to: "double", 
+                        onError: 0,  
+                        onNull: 0
+                    }
+                }
+            },
+            }
+        }
+      ]);
+
+    const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
+
+    return {"data": KareegarBookData, "count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty};
 });
 
 const kareegarBookDeleteSchema = {
@@ -187,9 +348,7 @@ const kareegarBookDeleteSchema = {
 }
 fastify.post('/kareegarBookDelete', kareegarBookDeleteSchema, async (request, reply) => {
     const KareegarBook = mongoose.model('kareegar-book')
-    //console.log(request.body);
     const KareegarBookInfo = await KareegarBook.updateMany({ _id: request.body.kareegarBookId }, {is_deleted_flag: true}, { multi: true })
-    // console.log(masterStockInfo);
     return {success: true, message: 'User deleted'};
 });
 
@@ -213,10 +372,7 @@ const kareegarBookCloseSchema = {
 }
 fastify.patch('/kareegarBookClose', kareegarBookCloseSchema, async (request, reply) => {
     const KareegarBook = mongoose.model('kareegar-book')
-    // console.log("close Kareegar Book");
-    // console.log("request",request.body);
     const allDocs = await KareegarBook.find({});
-    // console.log(allDocs);
 
     if (request.body.cutoffDateNumber === '0'){
         request.log.error("cutoffDateNumber Incorrect");
