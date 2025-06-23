@@ -292,7 +292,7 @@ fastify.get('/kareegar-list', kareegarListSchema, async (request, reply) => {
         }
       ]);   
 
-    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+    const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
     return {"count": totalCount, "data": KareegarTest, "totalQty": isEmpty ? defaultTotals: totalQty};
 

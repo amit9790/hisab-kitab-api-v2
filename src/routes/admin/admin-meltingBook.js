@@ -402,7 +402,7 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
             }
         ]);
     
-        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+        const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
         return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": MeltingBookTest};
         }
@@ -592,7 +592,7 @@ fastify.get('/meltingStock-list', meltingBookListSchema, async (request, reply) 
         }
     ]);
 
-    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+    const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
     return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": MeltingBookTest};
 });
