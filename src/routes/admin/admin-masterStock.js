@@ -127,7 +127,7 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
             }
           ]);
     
-        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+        const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
           
         return {"data": masterStocksTest, "count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty};
     }
@@ -154,7 +154,7 @@ fastify.get('/masterStock-list', masterStockListSchema, async (request, reply) =
         }
       ]);
 
-    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);      
+    const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
     return {"data": masterStocksTest, "count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty};
 });

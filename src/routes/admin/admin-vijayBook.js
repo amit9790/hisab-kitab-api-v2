@@ -902,7 +902,7 @@ fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
 
             const totalCount = totalCountResult[0]?.total || 0;
             
-            const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+            const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
             return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
 
@@ -979,13 +979,13 @@ fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
 
             const totalCount = totalCountResult[0]?.total || 0;
             
-            const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+            const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
             return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
 
         };
 
-        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+        const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
         return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
         }
@@ -1432,7 +1432,7 @@ fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
 
         const totalCount = totalCountResult[0]?.total || 0;
         
-        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+        const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
         return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
 
@@ -1509,13 +1509,13 @@ fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
 
         const totalCount = totalCountResult[0]?.total || 0;
         
-        const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+        const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
         return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
 
     };
 
-    const isEmpty = totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0);
+    const isEmpty = totalQty.length === 0 || (totalQty.length === 1 && Object.values(totalQty[0]).every(arr => Array.isArray(arr) && arr.length === 0));
 
     return {"count": totalCount, "totalQty": isEmpty ? defaultTotals: totalQty, "data": VijayBookData};
  
