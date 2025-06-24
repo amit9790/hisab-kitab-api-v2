@@ -854,6 +854,14 @@ fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
             }
         ]);
     
+        totalQty.forEach(obj => {
+        Object.keys(obj).forEach(key => {
+            if (Array.isArray(obj[key]) && obj[key].length === 0) {
+            obj[key] = [{ _id: null, [key]: 0 }];
+            }
+        });
+        });
+    
         if (checkSolderChain !== 'undefined' && checkSolderChain !== "false") {
             query.solderChainIssue = { $exists: true, $not: { $size: 0 } };
             const VijayBookData = await VijayBook.aggregate([
@@ -1383,6 +1391,14 @@ fastify.get('/vijayBook-list', vijayBookListSchema, async (request, reply) => {
             }
         }
     ]);
+
+    totalQty.forEach(obj => {
+    Object.keys(obj).forEach(key => {
+        if (Array.isArray(obj[key]) && obj[key].length === 0) {
+        obj[key] = [{ _id: null, [key]: 0 }];
+        }
+    });
+    });
 
     if (checkSolderChain !== 'undefined' && checkSolderChain !== "false") {
         query.solderChainIssue = { $exists: true, $not: { $size: 0 } };
