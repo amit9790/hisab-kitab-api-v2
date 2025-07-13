@@ -76,6 +76,7 @@ const updatUtilitySchema = {
             polishChatkaLoss: { type: 'string' },
             polishLoss: { type: 'string' },
             polishFineLoss: { type: 'string' },
+            polishChill: { type: 'string' },
         },
     },
     preHandler: fastify.auth([fastify.jwtAuth, fastify.isAdmin], {relation: 'and'})
@@ -123,7 +124,10 @@ fastify.patch('/update/utility', updatUtilitySchema, async (request, _reply) => 
             utilityBook_data.polishLoss = request.body.polishLoss;
         }
         if (request.body.polishFineLoss){
-            utilityBook_data.polishLoss = request.body.polishLoss;
+            utilityBook_data.polishFineLoss = request.body.polishLoss;
+        }
+        if (request.body.polishChill){
+            utilityBook_data.polishChill = request.body.polishChill;
         }
 
         const cleaned_utilityBook_data = removeEmpty(utilityBook_data);
