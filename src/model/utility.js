@@ -52,6 +52,10 @@ module.exports = function (fastify, opts, next) {
         type: String,
         required: false,
       },
+      polishChill: {
+        type: String,
+        required: false,
+      },
       visible: {
         type: Boolean,
         required: true,

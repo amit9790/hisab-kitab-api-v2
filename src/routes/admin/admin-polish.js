@@ -24,6 +24,7 @@ const polishSchema = {
             recvWeight: { type: 'string' },
             lossWeight: { type: 'string' },
             chill: { type: 'string' },
+            melting: { type: 'string' },
             createdBy: { type: 'string' },
             modifiedBy: { type: 'string' },
         },
@@ -51,6 +52,7 @@ fastify.post('/polish', polishSchema, async (request, _reply) => {
             recvWeight: request.body.recvWeight,
             lossWeight: request.body.lossWeight,
             chill: request.body.chill,
+            melting: request.body.melting,
             }
 
         const cleaned_polish_data = removeEmpty(polish_data);
@@ -102,7 +104,8 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
         lossWeight: 0,
         chill: 0,
         fine: 0,
-        chatka: 0
+        chatka: 0,
+        melting: 0
     }];
 
     if (state==="all"){
@@ -124,7 +127,8 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
                 lossWeight: { $sum: "$lossWeight" },
                 chill: { $sum: "$chill" },
                 fine: { $sum: "$fine" },
-                chatka: { $sum: "$chatka" }
+                chatka: { $sum: "$chatka" },
+                melting: { $sum: "$melting" }
               }
             }
           ]);
@@ -162,7 +166,8 @@ fastify.get('/polish-list', polishListSchema, async (request, reply) => {
             lossWeight: { $sum: "$lossWeight" },
             chill: { $sum: "$chill" },
             fine: { $sum: "$fine" },
-            chatka: { $sum: "$chatka" }
+            chatka: { $sum: "$chatka" },
+            melting: { $sum: "$melting" }
           }
         }
       ]);

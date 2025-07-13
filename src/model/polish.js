@@ -45,6 +45,10 @@ module.exports = function (fastify, opts, next) {
         type: Number,
         required: false,
       },
+      melting: {
+        type: Number,
+        required: false,
+      },
       createdBy: {
         type: String,
         required: false,
