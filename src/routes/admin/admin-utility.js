@@ -124,7 +124,7 @@ fastify.patch('/update/utility', updatUtilitySchema, async (request, _reply) => 
             utilityBook_data.polishLoss = request.body.polishLoss;
         }
         if (request.body.polishFineLoss){
-            utilityBook_data.polishFineLoss = request.body.polishLoss;
+            utilityBook_data.polishFineLoss = request.body.polishFineLoss;
         }
         if (request.body.polishChill){
             utilityBook_data.polishChill = request.body.polishChill;
