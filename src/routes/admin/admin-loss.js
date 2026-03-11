@@ -46,14 +46,15 @@ fastify.patch('/lossAcct', updateLossSchema, async (request, _reply) => {
 
         const cleaned_loss_data = removeEmpty(lossData);
 
-        await Loss.findOneAndUpdate(
+        const modifiedLossData = await Loss.findOneAndUpdate(
             {transactionId: request.body.transactionId, type: request.body.type},
             cleaned_loss_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const loss = await Loss.find({}).populate('user_id', ['_id', 'email'])
-        return loss;
+        return {success: true, message: 'Loss Acct data updated successfully', id: modifiedLossData._id};
+        // const loss = await Loss.find({}).populate('user_id', ['_id', 'email'])
+        // return loss;
     }
     catch (e) {
         console.log(e);
@@ -105,14 +106,15 @@ fastify.post('/lossAcct', addLossSchema, async (request, _reply) => {
 
         const cleaned_loss_data = removeEmpty(lossData);
 
-        await Loss.findOneAndUpdate(
+        const addedLossData = await Loss.findOneAndUpdate(
             {_id: lossId},
             cleaned_loss_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const loss = await Loss.find({}).populate('user_id', ['_id', 'email'])
-        return loss;
+        return {success: true, message: 'Loss Acct data added successfully', id: addedLossData._id};
+        // const loss = await Loss.find({}).populate('user_id', ['_id', 'email'])
+        // return loss;
     }
     catch (e) {
         console.log(e);
