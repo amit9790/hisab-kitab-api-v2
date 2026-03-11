@@ -390,7 +390,7 @@ const kareegarBookCloseSchema = {
 }
 fastify.patch('/kareegarBookClose', kareegarBookCloseSchema, async (request, reply) => {
     const KareegarBook = mongoose.model('kareegar-book')
-    const allDocs = await KareegarBook.find({});
+    // const allDocs = await KareegarBook.find({});
 
     if (request.body.cutoffDateNumber === '0'){
         request.log.error("cutoffDateNumber Incorrect");
