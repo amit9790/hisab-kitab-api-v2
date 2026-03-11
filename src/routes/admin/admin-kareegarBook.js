@@ -71,8 +71,7 @@ fastify.post('/kareegarBook', addKareegarBookSchema, async (request, _reply) => 
             cleaned_kareegarBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
-
-        return {success: true, message: 'Kareegar Book data added successfully', id: addedKareegarBookData.kareegar_id};
+        return addedKareegarBookData;
         // const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
         // return kareegarBook_data;
     }
