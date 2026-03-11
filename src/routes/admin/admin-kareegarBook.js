@@ -66,14 +66,15 @@ fastify.post('/kareegarBook', addKareegarBookSchema, async (request, _reply) => 
 
         const cleaned_kareegarBook_data = removeEmpty(kareegarBook_data);
 
-        await KareegarBook.findOneAndUpdate(
+        const addedKareegarBookData =await KareegarBook.findOneAndUpdate(
             {_id: kareegarBookId},
             cleaned_kareegarBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
-        return kareegarBook_data;
+        return {success: true, message: 'Kareegar Book data added successfully', id: addedKareegarBookData.kareegar_id};
+        // const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
+        // return kareegarBook_data;
     }
     catch (e) {
         console.log(e);
@@ -120,14 +121,16 @@ fastify.patch('/update/kareegarBook', updateKareegarBookSchema, async (request, 
 
         const cleaned_kareegarBook_data = removeEmpty(kareegarBook_data);
 
-        await KareegarBook.findOneAndUpdate(
+        const updatedData = await KareegarBook.findOneAndUpdate(
             {_id: request.body._id},
             cleaned_kareegarBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
-        return kareegarBook;
+        return {success: true, message: 'Kareegar Book updated successfully', id: updatedData.kareegar_id};
+
+        // const kareegarBook = await KareegarBook.find({}).populate('user_id', ['_id', 'email'])
+        // return kareegarBook;
     }
     catch (e) {
         console.log(e);
