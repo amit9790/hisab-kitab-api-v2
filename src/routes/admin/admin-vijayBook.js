@@ -141,14 +141,13 @@ fastify.post('/vijayBook', addVijayBookSchema, async (request, _reply) => {
 
         const cleaned_vijayBook_data = removeEmpty(vijayBook_data);
 
-        await VijayBook.findOneAndUpdate(
+        const updatedData = await VijayBook.findOneAndUpdate(
             {_id: vijayBookId},
             cleaned_vijayBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const vijayBook = await VijayBook.find({}).populate('user_id', ['_id', 'email'])
-        return vijayBook;
+        return {success: true, message: 'VijayBook Data updated successfully', data: updatedData._id};
     }
     catch (e) {
         console.log(e);
@@ -296,14 +295,15 @@ fastify.patch('/update/vijayBook', updateVijayBookSchema, async (request, _reply
 
         const cleaned_vijayBook_data = removeEmpty(vijayBook_data);
 
-        await VijayBook.findOneAndUpdate(
+        const updatedDate = await VijayBook.findOneAndUpdate(
             {_id: request.body._id},
             cleaned_vijayBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const vijayBook = await VijayBook.find({}).populate('user_id', ['_id', 'email'])
-        return vijayBook;
+        // const vijayBook = await VijayBook.find({}).populate('user_id', ['_id', 'email'])
+        // return vijayBook;
+        return {success: true, message: 'VijayBook Data updated successfully', data: updatedDate._id};
     }
     catch (e) {
         console.log(e);
