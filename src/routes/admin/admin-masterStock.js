@@ -59,14 +59,15 @@ fastify.post('/masterStock', updatMasterStockSchema, async (request, _reply) => 
 
         const cleaned_masterStock_data = removeEmpty(masterStock_data);
 
-        await MasterStock.findOneAndUpdate(
+        const updatedData = await MasterStock.findOneAndUpdate(
             {_id: masterStockId},
             cleaned_masterStock_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const masterStock = await MasterStock.find({}).populate('user_id', ['_id', 'email'])
-        return masterStock;
+        return {success: true, message: 'MasterStock Data created successfully', data: updatedData._id};
+        // const masterStock = await MasterStock.find({}).populate('user_id', ['_id', 'email'])
+        // return masterStock;
     }
     catch (e) {
         console.log(e);

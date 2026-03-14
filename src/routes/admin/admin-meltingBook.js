@@ -50,14 +50,16 @@ fastify.post('/meltingBook', addMeltingBookSchema, async (request, _reply) => {
 
         const cleaned_meltingBook_data = removeEmpty(meltingBook_data);
 
-        await MeltingBook.findOneAndUpdate(
+        const updatedData = await MeltingBook.findOneAndUpdate(
             {_id: meltingBookId},
             cleaned_meltingBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const meltingBook = await MeltingBook.find({}).populate('user_id', ['_id', 'email'])
-        return meltingBook;
+        return {success: true, message: 'Melting Book Data added successfully', id: updatedData._id};
+
+        // const meltingBook = await MeltingBook.find({}).populate('user_id', ['_id', 'email'])
+        // return meltingBook;
     }
     catch (e) {
         console.log(e);
@@ -122,14 +124,15 @@ fastify.patch('/update/meltingBook', updatMeltingBookSchema, async (request, _re
 
         const cleaned_meltingBook_data = removeEmpty(meltingBook_data);
 
-        await MeltingBook.findOneAndUpdate(
+        const updatedData = await MeltingBook.findOneAndUpdate(
             {_id: request.body._id},
             cleaned_meltingBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const meltingBook = await MeltingBook.find({}).populate('user_id', ['_id', 'email'])
-        return meltingBook;
+        return {success: true, message: 'Melting Book Data updated successfully', id: updatedData._id};
+        // const meltingBook = await MeltingBook.find({}).populate('user_id', ['_id', 'email'])
+        // return meltingBook;
     }
     catch (e) {
         console.log(e);

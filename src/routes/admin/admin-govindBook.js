@@ -104,14 +104,15 @@ fastify.post('/govindBook', addGovindBookSchema, async (request, _reply) => {
 
         const cleaned_govindBook_data = removeEmpty(govindBook_data);
 
-        await GovindBook.findOneAndUpdate(
+        const updatedData = await GovindBook.findOneAndUpdate(
             {_id: govindBookId},
             cleaned_govindBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const govindBook = await GovindBook.find({}).populate('user_id', ['_id', 'email'])
-        return govindBook;
+        return {success: true, message: 'GovindBook Data created successfully', data: updatedData._id};
+        // const govindBook = await GovindBook.find({}).populate('user_id', ['_id', 'email'])
+        // return govindBook;
     }
     catch (e) {
         console.log(e);
@@ -223,14 +224,15 @@ fastify.patch('/update/govindBook', updateGovindBookSchema, async (request, _rep
 
         const cleaned_govindBook_data = removeEmpty(govindBook_data);
 
-        await GovindBook.findOneAndUpdate(
+        const updatedData = await GovindBook.findOneAndUpdate(
             {_id: request.body._id},
             cleaned_govindBook_data,
             {useFindAndModify: true, upsert: true, new: true}
         );
 
-        const govindBook = await GovindBook.find({}).populate('user_id', ['_id', 'email'])
-        return govindBook;
+        // const govindBook = await GovindBook.find({}).populate('user_id', ['_id', 'email'])
+        // return govindBook;
+        return {success: true, message: 'GovindBook Data updated successfully', data: updatedData._id};
     }
     catch (e) {
         console.log(e);
