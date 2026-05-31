@@ -1,5 +1,5 @@
 
-require('dotenv').config();
+require('dotenv').config({ path: process.env.ENV_FILE || '.env' });
 
 function ajvPlugin(ajv, _options) {
     ajv.addKeyword('isFileType', {
