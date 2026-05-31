@@ -1,5 +1,5 @@
 
-require('dotenv').config({ path: process.env.ENV_FILE || '.env' });
+require('dotenv').config({ path: process.env.ENV_FILE });
 
 function ajvPlugin(ajv, _options) {
     ajv.addKeyword('isFileType', {
@@ -101,4 +101,4 @@ fastify
     .register(require('./src/routes/normal_user/master-stock.routes'))
     .register(require('./src/routes/normal_user/melting-book.routes'))
 
-fastify.listen(process.env.PORT || 3000, '0.0.0.0')
+fastify.listen(process.env.PORT, '0.0.0.0')
